@@ -66,6 +66,7 @@ class ServicesLoader implements \Silex\ServiceProviderInterface
         $this->app['config'] = $this->app->share(
             function () {
                 return [
+                    'alexa_skill_id'              => getenv('ALEXA_SKILL_ID')              ? : null,
                     'application_env'             => getenv('APPLICATION_ENV')             ? : null,
                     'blackfire_server_id'         => getenv('BLACKFIRE_SERVER_ID')         ? : null,
                     'blackfire_server_token'      => getenv('BLACKFIRE_SERVER_TOKEN')      ? : null,

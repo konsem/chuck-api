@@ -26,6 +26,14 @@ jokes:
     prefix   : /jokes
     resource : routes/jokes.yml
 
+api.intg_alexa :
+    path     : /integration/alexa
+    methods  : [GET, POST]
+    defaults :
+        _controller : \Chuck\App\Api\Controller\Integration\AlexaController::indexAction
+    options  :
+        _before_middlewares : [ \Chuck\App\Api\Middleware\RequestBodyParser::parse, \Chuck\App\Api\Middleware\Verification::alexaOrigin ]
+
 api.intg_facebook_verify :
     path     : /integration/facebook
     methods  : GET
