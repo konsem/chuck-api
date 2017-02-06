@@ -11,7 +11,7 @@
  */
 namespace Chuck\App\Api\Middleware;
 
-use \Symfony\Component\HttpKernel\Exception as Exception;
+use Chuck\App\Api\Exception;
 use \Symfony\Component\HttpFoundation as HttpFoundation;
 
 /**
@@ -25,10 +25,10 @@ class Authorization
 {
     /**
      * Determine whether someone is allowed to write
-     *
+     * 
      * @param  HttpFoundation\Request $request
-     * @param  \Silex\Application $app
-     * @throws Exception\SlackVerificationTokenException
+     * @param  \Silex\Application     $app
+     * @throws Exception\UnauthorizedHttpException
      */
     public static function write(HttpFoundation\Request $request, \Silex\Application $app)
     {
@@ -41,7 +41,7 @@ class Authorization
             : null;
 
         if (! in_array($apiKey, $app['acl']['write'])) {
-            throw new Exception\UnauthorizedHttpException();
+            throw new Exception\UnauthorizedHttpException('Could not verify "API key".');
         }
     }
 }

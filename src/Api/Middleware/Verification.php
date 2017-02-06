@@ -11,8 +11,8 @@
  */
 namespace Chuck\App\Api\Middleware;
 
-use Chuck\App\Api\Exception as Exception;
-use \Symfony\Component\HttpFoundation as HttpFoundation;
+use Chuck\App\Api\Exception;
+use \Symfony\Component\HttpFoundation;
 
 /**
  *
@@ -24,11 +24,29 @@ use \Symfony\Component\HttpFoundation as HttpFoundation;
 class Verification
 {
     /**
-     * Verify the slack origin
-     *
+     * 
      * @param  HttpFoundation\Request $request
      * @param  \Silex\Application $app
-     * @throws Exception\SlackVerificationTokenException
+     * @throws Exception\UnauthorizedHttpException
+     */
+    public static function alexaOrigin(HttpFoundation\Request $request, \Silex\Application $app)
+    {
+        $data = $request->request->all();
+
+        if (empty($data['session']['application']['applicationId'])) {
+            throw new Exception\UnauthorizedHttpException('Could not verify "ALEXA_SKILL_ID".');
+        }
+        
+        if ($data['session']['application']['applicationId'] !== $app['config']['alexa_skill_id']) {
+            throw new Exception\UnauthorizedHttpException('Could not verify "ALEXA_SKILL_ID".');
+        }
+    }
+
+    /**
+     * 
+     * @param  HttpFoundation\Request $request
+     * @param  \Silex\Application $app
+     * @throws Exception\UnauthorizedHttpException
      */
     public static function slackOrigin(HttpFoundation\Request $request, \Silex\Application $app)
     {
@@ -38,7 +56,7 @@ class Verification
         );
 
         if ($token !== $app['config']['slack_verification_token']) {
-            throw new Exception\SlackVerificationTokenException();
+            throw new Exception\UnauthorizedHttpException('Could not verify "SLACK_VERIFICATION_TOKEN".');
         }
     }
 }
