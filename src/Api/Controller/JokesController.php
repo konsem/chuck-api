@@ -10,12 +10,12 @@
  */
 namespace Chuck\App\Api\Controller;
 
+use \Chuck\App\Api\Service\CacheService as CacheService;
 use \Chuck\App\Api\Formatter as Formatter;
 use \Chuck\App\Api\Model as Model;
 use \Chuck\Entity as Entity;
 use \Symfony\Component\HttpFoundation as HttpFoundation;
 use \Symfony\Component\HttpKernel\Exception as Exception;
-use \Symfony\Component\Routing\Generator as Generator;
 
 /**
  *
@@ -98,21 +98,23 @@ class JokesController
      */
     public function getAction(\Silex\Application $app, HttpFoundation\Request $request, $id)
     {
-        /* @var \Chuck\JokeFacade $jokeFacade */
-        $jokeFacade = $app['chuck.joke'];
-
         if ('application/json' === $request->headers->get('accept')) {
+            /** @var CacheService $cache */
+            $cacheService = $app['cache_service'];
+            
             /* @var Entity\Joke $joke */
-            $joke = $jokeFacade->get($id);
+            $joke = $cacheService->getJokeById($id);
 
             /* @var Formatter\JokeFormatter $jokeFormatter */
             $jokeFormatter = new Formatter\JokeFormatter($app['url_generator']);
 
             return new Model\JsonResponse(
-                $jokeFormatter->format($jokeFacade->update($joke))
+                $jokeFormatter->format($joke)
             );
         }
-
+        
+        /* @var \Chuck\JokeFacade $jokeFacade */
+        $jokeFacade = $app['chuck.joke'];
         $jokeWindow = $jokeFacade->window($id);
 
         if (! $jokeWindow instanceof Entity\JokeWindow) {
@@ -154,9 +156,11 @@ class JokesController
      */
     public function randomAction(\Silex\Application $app, HttpFoundation\Request $request)
     {
-        $joke = $app['chuck.joke']->random(
-            $category = $request->query->get('category', null)
-        );
+        $category = $request->query->get('category', null);
+
+        $joke = $category != null
+            ? $app['chuck.joke']->random($category)
+            : $app['cache_service']->getRandomJoke();
 
         if (! $joke instanceof Entity\Joke) {
             throw new Exception\NotFoundHttpException();
@@ -257,12 +261,15 @@ class JokesController
                 'value'      => $request->request->get('value', $joke->getValue())
             ]
         );
-
+        $joke = $jokeFacade->update($joke);
+        
+        $app['cache']->invalidateJokeCache($id);
+        
         /* @var Formatter\JokeFormatter $jokeFormatter */
         $jokeFormatter = new Formatter\JokeFormatter($app['url_generator']);
-
+        
         return new Model\JsonResponse(
-            $jokeFormatter->format($jokeFacade->update($joke))
+            $jokeFormatter->format($joke)
         );
     }
 }

@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fed37ad3429e66b2a417888733a63ed5",
-    "content-hash": "40173937f14f8f00656f4995af88f9b8",
+    "hash": "5ae9b4a17859f7bf8551316554398a81",
+    "content-hash": "111f577cc859a2abb8e0831e2502f68e",
     "packages": [
         {
             "name": "bramdevries/oauth2-slack",
@@ -141,16 +141,16 @@
         },
         {
             "name": "chucknorris/lib",
-            "version": "v0.4.0",
+            "version": "v0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/chucknorris-io/chuck-lib.git",
-                "reference": "89b129b3a0c1c9f3f0f8eba12a8f485572485e2a"
+                "reference": "90475eefdf3cfb799959f2631bf3c9d59ce06a0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chucknorris-io/chuck-lib/zipball/89b129b3a0c1c9f3f0f8eba12a8f485572485e2a",
-                "reference": "89b129b3a0c1c9f3f0f8eba12a8f485572485e2a",
+                "url": "https://api.github.com/repos/chucknorris-io/chuck-lib/zipball/90475eefdf3cfb799959f2631bf3c9d59ce06a0c",
+                "reference": "90475eefdf3cfb799959f2631bf3c9d59ce06a0c",
                 "shasum": ""
             },
             "require": {
@@ -177,9 +177,9 @@
             "support": {
                 "email": "m@matchilling.com",
                 "issues": "https://github.com/chucknorris-io/chuck-lib/issues",
-                "source": "https://github.com/chucknorris-io/chuck-lib/tree/master"
+                "source": "https://github.com/chucknorris-io/chuck-lib/tree/v0.5.0"
             },
-            "time": "2016-12-20 22:45:25"
+            "time": "2017-04-22 12:37:57"
         },
         {
             "name": "doctrine/annotations",
@@ -1729,6 +1729,56 @@
                 "dependency injection"
             ],
             "time": "2013-11-22 08:30:29"
+        },
+        {
+            "name": "predis/predis",
+            "version": "v1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nrk/predis.git",
+                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nrk/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.9"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.8"
+            },
+            "suggest": {
+                "ext-curl": "Allows access to Webdis when paired with phpiredis",
+                "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Predis\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Daniele Alessandri",
+                    "email": "suppakilla@gmail.com",
+                    "homepage": "http://clorophilla.net"
+                }
+            ],
+            "description": "Flexible and feature-complete Redis client for PHP and HHVM",
+            "homepage": "http://github.com/nrk/predis",
+            "keywords": [
+                "nosql",
+                "predis",
+                "redis"
+            ],
+            "time": "2016-06-16 16:22:20"
         },
         {
             "name": "psr/http-message",

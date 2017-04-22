@@ -8,7 +8,7 @@
         "php": "~7.0",
         "bramdevries/oauth2-slack": "~0.1",
         "bramus/monolog-colored-line-formatter": "^2.0",
-        "chucknorris/lib": "~0.3",
+        "chucknorris/lib": "~0.5",
         "facebook/graph-sdk": "^5.3",
         "monolog/monolog": "~1",
         "nochso/html-compress-twig": "~1",
@@ -16,7 +16,8 @@
         "symfony/config": "~3.0",
         "symfony/yaml": "~3.0",
         "twig/twig": "~1.2",
-        "vlucas/phpdotenv": "^2.3"
+        "vlucas/phpdotenv": "^2.3",
+        "predis/predis": "^1.1"
     },
     "repositories": [{
         "type": "vcs",
@@ -30,6 +31,7 @@
     "prefer-stable": true,
     "minimum-stability": "dev",
     "scripts": {
+        "compile": "bin/populate_cache",
         "serve": "bin/start.sh"
     }
 }

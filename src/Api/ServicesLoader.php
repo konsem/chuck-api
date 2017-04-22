@@ -80,11 +80,22 @@ class ServicesLoader implements \Silex\ServiceProviderInterface
                     'logzio_api_key'              => getenv('LOGZIO_API_KEY')              ? : null,
                     'mongodb_uri'                 => getenv('MONGODB_URI')                 ? : null,
                     'papertrail_api_token'        => getenv('PAPERTRAIL_API_TOKEN')        ? : null,
+                    'redis_url'                   => getenv('REDIS_URL')                   ? : null,
                     'slack_auth'                  => getenv('SLACK_AUTH')
                         ? json_decode(getenv('SLACK_AUTH'), true)
                         : null,
                     'slack_verification_token'    => getenv('SLACK_VERIFICATION_TOKEN')    ? : null
                 ];
+            }
+        );
+        
+        $this->app['cache_service'] = $this->app->share(
+            function () {
+                return new \Chuck\App\Api\Service\CacheService(
+                    new \Predis\Client($this->app['config']['redis_url']),
+                    $this->app['chuck.entity_factory'],
+                    $this->app['chuck.joke']
+                );
             }
         );
 
