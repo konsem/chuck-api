@@ -359,6 +359,31 @@
             -webkit-animation-iteration-count: 1;
             animation-iteration-count: 1
         }
+
+        form#newsletter {
+          width: 100%;
+        }
+
+        #newsletter input {
+          background: #fff;
+          border: 1px solid #d8d8d8;
+          font-size: 13px;
+          margin-bottom: 2em;
+          padding: 2%;
+          white-space: normal;
+        }
+
+        #newsletter input[type=email] {
+          width: 74%;
+        }
+
+        #newsletter input[type=submit] {
+          width: 20%;
+        }
+
+        #newsletter input[type=submit]:hover {
+          cursor: pointer;
+        }
     </style>
 
 </head>
@@ -407,6 +432,8 @@
         ga('create', 'UA-75350742-1', 'auto');
         ga('send', 'pageview');
     </script>
+
+    <script type="text/javascript" src="//downloads.mailchimp.com/js/signup-forms/popup/embed.js" data-dojo-config="usePlainJson: true, isDebug: false"></script><script type="text/javascript">require(["mojo/signup-forms/Loader"], function(L) { L.start({"baseUrl":"mc.us17.list-manage.com","uuid":"aa0ea0f3e3c1967e3ffb161ef","lid":"da67274af1"}) })</script>
 </body>
 
 </html>
