@@ -70,6 +70,31 @@ Example response:
 }
 ```
 
+## Local development
+
+To start the stack using docker you need to set a couple of environment variables which are defined in an env file in the root directory of the project. All required variable identifiers are shipped in the [.env.dist](./.end.dist) file which you can use as an example.
+
+```sh
+$ docker-compose up     # Will run as a long running process
+$ docker-compose up -d  # Will run in background
+```
+
+### Accessing the applications
+
+By default only two ports of the complete stack are exposed to your localhost, those are:
+  - `80`
+  - `443`
+
+### Viewing the stack logs
+
+As long as your are inside the project's root directory you can run one of the following to see the container logs:
+
+```sh
+$ docker-compose logs     # Equivalent to tail -f and show all containers
+$ docker-compose logs web # Will only show logs for the nginx container
+$ docker-compose logs api # Will only show logs for the api container
+```
+
 ## License
 
 This distribution is covered by the **GNU GENERAL PUBLIC LICENSE**, Version 3, 29 June 2007.
