@@ -230,6 +230,11 @@ class SlackController
         $this->setLogger($app['monolog']);
 
         if ($input->isHelpMode()) {
+            $attachments[] = [
+                'title'     => 'The Daily Chuck',
+                'text'      => ':facepunch: Sign up for *The Daily Chuck* and get your daily dose of the best #ChuckNorrisFacts every morning straight int your inbox! https://mailchi.mp/5a19a2898bf7/the-daily-chuck',
+                'mrkdwn_in' => [ 'text' ]
+            ];
 
             $attachments[] = [
                 'title'     => 'Random joke',
