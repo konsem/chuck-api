@@ -263,7 +263,7 @@ class JokesController
         );
         $joke = $jokeFacade->update($joke);
         
-        $app['cache']->invalidateJokeCache($id);
+        $app['cache_service']->invalidateJokeCache($id);
         
         /* @var Formatter\JokeFormatter $jokeFormatter */
         $jokeFormatter = new Formatter\JokeFormatter($app['url_generator']);
