@@ -104,6 +104,14 @@ class TheDailyChuckController
         $rssVersion->appendChild($rss->createTextNode('2.0'));
         $rootNode->appendChild($rssVersion);
 
+        $rssAtomNs = $rss->createAttribute('xmlns:content');
+        $rssAtomNs->appendChild($rss->createTextNode('http://purl.org/rss/1.0/modules/content/'));
+        $rootNode->appendChild($rssAtomNs);
+
+        $rssAtomNs = $rss->createAttribute('xmlns:atom');
+        $rssAtomNs->appendChild($rss->createTextNode('http://www.w3.org/2005/Atom'));
+        $rootNode->appendChild($rssAtomNs);
+
         $channel = $rss->createElement('channel');
         $rootNode->appendChild($channel);
 
@@ -115,9 +123,29 @@ class TheDailyChuckController
         $description->appendChild($rss->createTextNode(self::DESCRIPTION));
         $channel->appendChild($description);
 
+        $feedUrl = $app['url_generator']->generate('feed.daily_chuck', [
+            'extension' => 'xml'
+        ], \Symfony\Component\Routing\Generator\UrlGenerator::ABSOLUTE_URL);
+
         $link = $rss->createElement('link');
-        $link->appendChild($rss->createTextNode($app['url_generator']->generate('api', [], \Symfony\Component\Routing\Generator\UrlGenerator::ABSOLUTE_URL)));
+        $link->appendChild($rss->createTextNode($feedUrl));
         $channel->appendChild($link);
+
+        $atomLink = $rss->createElement('atom:link');
+        $rootNode->appendChild($rssAtomNs);
+
+        $atomLinkHref = $rss->createAttribute('href');
+        $atomLinkHref->appendChild($rss->createTextNode($feedUrl));
+        $atomLink->appendChild($atomLinkHref);
+
+        $atomLinkRel = $rss->createAttribute('rel');
+        $atomLinkRel->appendChild($rss->createTextNode('self'));
+        $atomLink->appendChild($atomLinkRel);
+
+        $atomLinkType = $rss->createAttribute('type');
+        $atomLinkType->appendChild($rss->createTextNode('application/rss+xml'));
+        $atomLink->appendChild($atomLinkType);
+        $channel->appendChild($atomLink);
 
         $issueList = $app['service.the_daily_chuck']->getIssues();
         foreach ($issueList as $issueElement) {
@@ -131,13 +159,13 @@ class TheDailyChuckController
             $itemTitle->appendChild($rss->createTextNode($issueElement['issue']));
             $item->appendChild($itemTitle);
 
-            $itemContent = $rss->createElementNS('http://purl.org/rss/1.0/modules/content/', 'content:encoded');
-            $itemContent->appendChild($rss->createTextNode($joke->getValue()));
-            $item->appendChild($itemContent);
-
             $itemDescription = $rss->createElement('description');
             $itemDescription->appendChild($rss->createTextNode($joke->getValue()));
             $item->appendChild($itemDescription);
+
+            $itemContentEncoded = $rss->createElement('content:encoded');
+            $itemContentEncoded->appendChild($rss->createCDATASection($joke->getValue()));
+            $item->appendChild($itemContentEncoded);
 
             $itemLink = $rss->createElement('link');
             $itemLink->appendChild($rss->createTextNode($app['url_generator']->generate('api.get_joke', [
