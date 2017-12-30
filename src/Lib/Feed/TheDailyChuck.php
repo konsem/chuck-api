@@ -12,8 +12,8 @@
 namespace Chuck\Feed;
 
 use Aws\S3\S3Client;
-use DateTime;
 use Chuck\JokeFacade;
+use DateTime;
 
 /**
  * TheDailyChuck
@@ -55,20 +55,17 @@ class TheDailyChuck
      */
     private function fetchIssueList()
     {
-        if (! empty($this->cache['issues'])) {
-            return $this->cache['issues'];
-        }
-
         if (! $this->s3Client->doesObjectExist($this->bucket, $this->key)) {
             return [];
         }
 
-        $result = $this->s3Client->getObject([
-            'Bucket' => $this->bucket,
-            'Key' => $this->key
-        ]);
+        $result = $this->s3Client->getObject(
+            [
+                'Bucket' => $this->bucket,
+                'Key' => $this->key
+            ]);
 
-        return $this->cache['issues'] = json_decode($result['Body'], true);
+        return json_decode($result['Body'], true);
     }
 
     /**
@@ -79,6 +76,7 @@ class TheDailyChuck
     {
         $issueCount = 0;
         $issueList = $this->fetchIssueList();
+        $now = new DateTime();
         $response = [];
 
         $published = function ($key) {
@@ -86,17 +84,21 @@ class TheDailyChuck
         };
 
         foreach ($issueList as $key => $issueElement) {
-            $joke = $this->jokeFacade->get($issueElement['joke_id']);
+            $issueDate = new DateTime($key);
 
-            array_push($response, [
-                'issue' => ++ $issueCount,
-                'published' => $published($key),
-                'joke' => $joke
-            ]);
+            if ($issueDate <= $now) {
+                $joke = $this->jokeFacade->get($issueElement['joke_id']);
+
+                array_push($response,
+                    [
+                        'issue' => ++ $issueCount,
+                        'published' => $published($key),
+                        'joke' => $joke
+                    ]);
+            }
         }
 
-        $today = new DateTime();
-        $key = $today->format('Y-m-d');
+        $key = $now->format('Y-m-d');
         if (array_key_exists($key, $issueList)) {
             return array_reverse($response);
         }
@@ -121,11 +123,12 @@ class TheDailyChuck
         ];
         $this->updateIssueList($issueList);
 
-        array_push($response, [
-            'issue' => ++ $issueCount,
-            'published' => $published($key),
-            'joke' => $joke
-        ]);
+        array_push($response,
+            [
+                'issue' => ++ $issueCount,
+                'published' => $published($key),
+                'joke' => $joke
+            ]);
 
         return array_reverse($response);
     }
@@ -137,8 +140,6 @@ class TheDailyChuck
      */
     private function updateIssueList($issueList = [])
     {
-        $this->cache['issues'] = $issueList;
-
         return $this->s3Client->upload($this->bucket, $this->key, json_encode($issueList));
     }
 }
