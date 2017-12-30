@@ -107,5 +107,10 @@ class ServicesLoader implements \Silex\ServiceProviderInterface
                 'key' => sprintf('newsletter/%s/dailychuck/issues.json', $this->app['application_env'])
             ], $this->app['aws.s3'], $this->app['chuck.joke']);
         });
+
+        $app['url_generator'] = $app->share(function ($app) {
+            $app->flush();
+            return new \Chuck\App\Api\Routing\UrlGenerator($app['routes'], $app['request_context']);
+        });
     }
 }

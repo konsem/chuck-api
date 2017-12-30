@@ -19,15 +19,10 @@ if (file_exists(sprintf('%s/.env', $appDirectory))) {
 $app = new \Silex\Application();
 
 $app['application_env'] = \Chuck\Util::getEnvOrDefault('APPLICATION_ENV', 'production');
-$app['debug']           = 'production' === $app['application_env'] ? false : true;
+$app['debug'] = 'production' === $app['application_env'] ? false : true;
 
-$app->extend('routes', function (
-    \Symfony\Component\Routing\RouteCollection $routes,
-    \Silex\Application                         $app
-) {
-    $loader = new \Symfony\Component\Routing\Loader\YamlFileLoader(
-        new \Symfony\Component\Config\FileLocator(__DIR__ . '/../config')
-    );
+$app->extend('routes', function (\Symfony\Component\Routing\RouteCollection $routes, \Silex\Application $app) {
+    $loader = new \Symfony\Component\Routing\Loader\YamlFileLoader(new \Symfony\Component\Config\FileLocator(__DIR__ . '/../config'));
 
     $collection = $loader->load('routes.yml');
     $routes->addCollection($collection);
@@ -37,24 +32,15 @@ $app->extend('routes', function (
 
 $app->register(new \Chuck\App\Api\ServicesLoader());
 
-$streamHandler = new \Monolog\Handler\StreamHandler(
-    'php://stdout',
-    \Monolog\Logger::INFO
-);
-$streamHandler->setFormatter(
-    new \Bramus\Monolog\Formatter\ColoredLineFormatter(new \Bramus\Monolog\Formatter\ColorSchemes\TrafficLight)
-);
-$app->register(
-    new \Silex\Provider\MonologServiceProvider(),
-    [
-        'monolog.name'    => 'chuck_norris',
-        'monolog.handler' => $streamHandler
-    ]
-);
+$streamHandler = new \Monolog\Handler\StreamHandler('php://stdout', \Monolog\Logger::INFO);
+$streamHandler->setFormatter(new \Bramus\Monolog\Formatter\ColoredLineFormatter(new \Bramus\Monolog\Formatter\ColorSchemes\TrafficLight()));
+$app->register(new \Silex\Provider\MonologServiceProvider(), [
+    'monolog.name' => 'chuck_norris',
+    'monolog.handler' => $streamHandler
+]);
 
-$app->register(new \Silex\Provider\UrlGeneratorServiceProvider());
 $app->register(new \Silex\Provider\TwigServiceProvider(), [
-    'twig.path'    => __DIR__ . '/../assets/views/'
+    'twig.path' => __DIR__ . '/../assets/views/'
 ]);
 $app['twig'] = $app->share($app->extend('twig', function ($twig, $app) {
     $twig->addFunction(new \Twig_SimpleFunction('asset', function ($asset) use ($app) {
@@ -63,7 +49,6 @@ $app['twig'] = $app->share($app->extend('twig', function ($twig, $app) {
         } else {
             return sprintf('https://assets.chucknorris.host/%s', ltrim($asset, '/'));
         }
-
     }));
     $twig->addExtension(new \nochso\HtmlCompressTwig\Extension());
     return $twig;
