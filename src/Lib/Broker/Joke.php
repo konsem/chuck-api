@@ -11,7 +11,7 @@
  */
 namespace Chuck\Broker;
 
-use \Chuck\Entity as Entity;
+use Chuck\Entity;
 
 /**
  *
@@ -196,11 +196,16 @@ class Joke
                     $row
                 );
             }
+
+            return [
+                'total'  => $response['total'],
+                'result' => $response['result']
+            ];
         }
 
         return [
-            'total'  => $response['total'],
-            'result' => $response['result']
+            'total'  => 0,
+            'result' => []
         ];
     }
 
