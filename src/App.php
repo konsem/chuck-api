@@ -55,12 +55,32 @@ $app['twig'] = $app->share($app->extend('twig', function ($twig, $app) {
 }));
 
 $app->error(function (\Exception $exception, $httpStatusCode) use ($app) {
-    if ($app['debug']) {
-        return;
-    }
+    /** @var Symfony\Component\HttpFoundation\Request $request */
+    $request = $app['request_stack']->getCurrentRequest();
+
+    /** @var Symfony\Component\HttpFoundation\HeaderBag $headers */
+    $headers = $request->headers;
 
     if (\Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND === $httpStatusCode) {
-        return $app['twig']->render('error_404.html');
+        switch ($headers->get('accept', 'text/html')) {
+            case 'application/json':
+                return new \Chuck\App\Api\Model\JsonResponse([
+                    'code'    => $exception->getCode() ?: 404,
+                    'message' => $exception->getMessage() ?: 'Not found'
+                ]);
+            case 'text/plain':
+                return new \Symfony\Component\HttpFoundation\Response(
+                    $exception->getMessage(),
+                    $httpStatusCode,
+                    [ 'content-type' => 'text/plain' ]
+                );
+            default:
+                return $app['twig']->render('error_404.html');
+        }
+    }
+
+    if ($app['debug']) {
+        return;
     }
 
     return $app->json([

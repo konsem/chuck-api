@@ -10,12 +10,11 @@
  */
 namespace Chuck\App\Api\Controller;
 
-use \Chuck\App\Api\Service\CacheService as CacheService;
-use \Chuck\App\Api\Formatter as Formatter;
-use \Chuck\App\Api\Model as Model;
-use \Chuck\Entity as Entity;
-use \Symfony\Component\HttpFoundation as HttpFoundation;
-use \Symfony\Component\HttpKernel\Exception as Exception;
+use Chuck\Entity;
+use Chuck\App\Api\Formatter;
+use Chuck\App\Api\Model;
+use Symfony\Component\HttpFoundation;
+use Symfony\Component\HttpKernel\Exception;
 
 /**
  *
@@ -101,7 +100,7 @@ class JokesController
         if ('application/json' === $request->headers->get('accept')) {
             /** @var CacheService $cache */
             $cacheService = $app['cache_service'];
-            
+
             /* @var Entity\Joke $joke */
             $joke = $cacheService->getJokeById($id);
 
@@ -112,7 +111,7 @@ class JokesController
                 $jokeFormatter->format($joke)
             );
         }
-        
+
         /* @var \Chuck\JokeFacade $jokeFacade */
         $jokeFacade = $app['chuck.joke'];
         $jokeWindow = $jokeFacade->window($id);
@@ -262,12 +261,12 @@ class JokesController
             ]
         );
         $joke = $jokeFacade->update($joke);
-        
+
         $app['cache_service']->invalidateJokeCache($id);
-        
+
         /* @var Formatter\JokeFormatter $jokeFormatter */
         $jokeFormatter = new Formatter\JokeFormatter($app['url_generator']);
-        
+
         return new Model\JsonResponse(
             $jokeFormatter->format($joke)
         );
