@@ -54,6 +54,14 @@ sitemap.jokes :
     defaults  :
         _controller : \Chuck\App\Api\Controller\SitemapController::jokesAction
 
+page.daily_chuck:
+    path      : /daily-chuck
+    methods   : GET
+    defaults  :
+        _controller : \Chuck\App\Api\Controller\RedirectController::urlRedirectAction
+        path        : https://matchilling.us17.list-manage.com/subscribe/post?u=aa0ea0f3e3c1967e3ffb161ef&amp;id=da67274af1
+        permanent   : true
+
 feed.daily_chuck :
     path      : /feed/daily-chuck.{extension}
     methods   : GET
