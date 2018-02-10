@@ -55,37 +55,39 @@ $app['twig'] = $app->share($app->extend('twig', function ($twig, $app) {
 }));
 
 $app->error(function (\Exception $exception, $httpStatusCode) use ($app) {
+    if ($app['debug']) {
+        return;
+    }
+
     /** @var Symfony\Component\HttpFoundation\Request $request */
     $request = $app['request_stack']->getCurrentRequest();
 
     /** @var Symfony\Component\HttpFoundation\HeaderBag $headers */
     $headers = $request->headers;
 
-    if (\Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND === $httpStatusCode) {
-        switch ($headers->get('accept', 'text/html')) {
-            case 'application/json':
-                return new \Chuck\App\Api\Model\JsonResponse([
-                    'code'    => $exception->getCode() ?: 404,
-                    'message' => $exception->getMessage() ?: 'Not found'
-                ]);
-            case 'text/plain':
-                return new \Symfony\Component\HttpFoundation\Response(
-                    $exception->getMessage(),
-                    $httpStatusCode,
-                    [ 'content-type' => 'text/plain' ]
-                );
-            default:
-                return $app['twig']->render('error_404.html');
-        }
-    }
+    // Don't expose server error messages
+    $default = 'Whoops, looks like something went wrong.';
+    $message = 500 <= $httpStatusCode
+        ? $default
+        : $exception->getMessage() ?: $default;
 
-    if ($app['debug']) {
-        return;
+    switch ($headers->get('accept', 'text/html')) {
+        case 'application/json':
+            return new \Chuck\App\Api\Model\JsonResponse([
+                'code'    => $httpStatusCode,
+                'message' => $message
+            ]);
+        case 'text/plain':
+            return new \Symfony\Component\HttpFoundation\Response(
+                $message,
+                $httpStatusCode,
+                [ 'content-type' => 'text/plain' ]
+            );
+        default:
+            return \Symfony\Component\HttpFoundation\Response::HTTP_NOT_FOUND === $httpStatusCode
+                ? $app['twig']->render('error_404.html')
+                : $app['twig']->render('error_generic.html');
     }
-
-    return $app->json([
-        'message' => 'Whoops, looks like something went wrong.'
-    ]);
 });
 
 return $app;

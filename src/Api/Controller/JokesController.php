@@ -185,13 +185,21 @@ class JokesController
      *
      * @param  \Silex\Application $app
      * @param  HttpFoundation\Request $request
-     * @throws Exception\NotFoundHttpException
+     * @throws Exception\UnprocessableEntityHttpException
      * @return HttpFoundation\Response|Model\JsonResponse
      */
     public function searchAction(\Silex\Application $app, HttpFoundation\Request $request)
     {
-        if (! $query = $request->query->get('query', null)) {
-            throw new Exception\NotFoundHttpException();
+        /* @var HttpFoundation\ParameterBag $params */
+        $params = $request->query;
+        if (! $params->has('query')) {
+            throw new Exception\UnprocessableEntityHttpException('Missing "query" parameter.');
+        }
+
+        /* @var string $query */
+        $query = $params->get('query');
+        if (empty($query)) {
+            throw new Exception\UnprocessableEntityHttpException('Parameter "query" must not be empty.');
         }
 
         $response = $app['chuck.joke']->searchByQuery($query);
