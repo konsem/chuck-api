@@ -29,6 +29,8 @@ api.get_joke :
     methods  : GET
     defaults :
         _controller : \Chuck\App\Api\Controller\JokesController::getAction
+    requirements:
+        id: '^[a-zA-Z0-9_-]{22}$'
 
 api.update_joke :
     path     : /{id}
@@ -37,3 +39,5 @@ api.update_joke :
         _controller : \Chuck\App\Api\Controller\JokesController::updateAction
     options  :
         _before_middlewares : [ \Chuck\App\Api\Middleware\Authorization::write, \Chuck\App\Api\Middleware\RequestBodyParser::parse ]
+    requirements:
+        id: '^[a-zA-Z0-9_-]{22}$'
