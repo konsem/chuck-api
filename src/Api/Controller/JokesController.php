@@ -37,7 +37,7 @@ class JokesController
     public function categoryAction(\Silex\Application $app, HttpFoundation\Request $request)
     {
         /* @var \Chuck\JokeFacade $jokeFacade */
-        $jokeFacade =  $app['chuck.joke'];
+        $jokeFacade = $app['chuck.joke'];
 
         /* @var array $categories */
         $categories = array_map(function ($category) {
@@ -197,9 +197,15 @@ class JokesController
         }
 
         /* @var string $query */
-        $query = $params->get('query');
+        $query = trim($params->get('query'));
         if (empty($query)) {
             throw new Exception\UnprocessableEntityHttpException('Parameter "query" must not be empty.');
+        }
+
+        if ($app['config']['app_minimum_query_length'] > strlen($query)) {
+            throw new Exception\UnprocessableEntityHttpException(
+                sprintf('Parameter "query" must have a minimum length of "%d".', $app['config']['app_minimum_query_length'])
+            );
         }
 
         $response = $app['chuck.joke']->searchByQuery($query);

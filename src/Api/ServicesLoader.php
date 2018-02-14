@@ -61,6 +61,7 @@ class ServicesLoader implements \Silex\ServiceProviderInterface
 
         $this->app['config'] = $this->app->share(function () {
             return [
+                'app_minimum_query_length' => 3,
                 'aws_region' => getenv('AWS_DEFAULT_REGION') ?: null,
                 'alexa_skill_id' => getenv('ALEXA_SKILL_ID') ?: null,
                 'application_env' => getenv('APPLICATION_ENV') ?: null,
