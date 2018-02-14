@@ -20,11 +20,11 @@ RUN apk add --no-cache --update \
 # Install AWS CLI tools
 RUN pip install awscli
 
-# Download latest db backup from s3
-RUN aws s3 cp s3://io.chucknorris.api/database/latest.sql /docker-entrypoint-initdb.d/latest.sql
-
 # Set default connection for psql
 ENV PGHOST localhost
 ENV PGPORT 5432
 ENV PGUSER postgres
 ENV PGPASSWORD postgres
+
+# Download latest db backup from s3
+RUN aws s3 cp s3://io.chucknorris.api/database/latest.sql /docker-entrypoint-initdb.d/latest.sql
