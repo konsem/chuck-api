@@ -12,6 +12,7 @@
 namespace Chuck\Broker;
 
 use Chuck\Entity;
+use \Symfony\Component\HttpKernel\Exception as Exception;
 
 /**
  *
@@ -69,10 +70,16 @@ class Joke
         }
 
         if (is_string($jokeId)) {
-            return $this->entityFactory->fromJson(
-                Entity\Joke::class,
-                $this->database->fetchColumn('SELECT get_joke(:joke_id);', [ 'joke_id' => $jokeId ])
-            );
+          $joke = $this->entityFactory->fromJson(
+              Entity\Joke::class,
+              $this->database->fetchColumn('SELECT get_joke(:joke_id);', [ 'joke_id' => $jokeId ])
+          );
+
+          if (! $joke instanceof Entity\Joke) {
+              throw new Exception\NotFoundHttpException();
+          }
+
+          return $joke;
         }
 
         throw new \InvalidArgumentException(
