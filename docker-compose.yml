@@ -6,7 +6,6 @@ services:
       context: .
       dockerfile: ./docker/nginx/Dockerfile
     container_name: chucknorris-web
-    # image: nginx:latest
     depends_on:
       php:
         condition: service_started
@@ -30,6 +29,7 @@ services:
       REDIS_URL: redis://redis:6379
     volumes:
       - .:/var/www/html
+      - /var/www/html/vendor/
     depends_on:
       redis:
         condition: service_started
@@ -45,28 +45,10 @@ services:
       - chucknorris-network
 
   postgres:
-    build:
-      context: .
-      dockerfile: ./docker/postgres/Dockerfile
-      args:
-        - AWS_ACCESS_KEY_ID
-        - AWS_SECRET_ACCESS_KEY
-        - AWS_DEFAULT_REGION
-        - POSTGRES_DB
-        - POSTGRES_USER
-        - POSTGRES_PASSWORD
-    container_name: chucknorris-db
-    environment:
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
-      POSTGRES_DB: chuck
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+    image: chucknorrisio/postgres
+    container_name: chucknorris-postgres
     networks:
       - chucknorris-network
-    volumes:
-      - ./docker/postgres/data:/docker-entrypoint-initdb.d/
 
 networks:
   chucknorris-network:
