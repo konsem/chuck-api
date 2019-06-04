@@ -55,6 +55,7 @@ public class SlackServiceTest {
         map.add("client_id", "slack.oauth.client_id");
         map.add("client_secret", "slack.oauth.client_secret");
         map.add("code", code);
+        map.add("redirect_uri", "slack.oauth.redirect_uri");
 
         when(restTemplate.exchange(
             "https://slack.com/api/oauth.access",

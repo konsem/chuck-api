@@ -51,6 +51,7 @@ public class SlackService {
         map.add("client_id", clientId);
         map.add("client_secret", clientSecret);
         map.add("code", code);
+        map.add("redirect_uri", redirectUrl);
 
         ResponseEntity<AccessToken> responseEntity = restTemplate.exchange(
                 "https://slack.com/api/oauth.access",

@@ -46,10 +46,10 @@ public class SlackController {
     }
 
     @RequestMapping(
-            value = "/connect/slack",
-            method = RequestMethod.GET,
-            headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_HTML_VALUE,
-            produces = MediaType.TEXT_HTML_VALUE
+        value = "/connect/slack",
+        method = RequestMethod.GET,
+        headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_HTML_VALUE,
+        produces = MediaType.TEXT_HTML_VALUE
     )
     public ModelAndView connect(@RequestParam(value = "code") final String code) throws JsonProcessingException {
         AccessToken accessToken = slackService.requestAccessToken(code);
@@ -74,13 +74,13 @@ public class SlackController {
     }
 
     @RequestMapping(
-            value = {"/integration/slack", "/jokes/slack"},
-            method = RequestMethod.POST,
-            headers = {
-                    HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
-                    HttpHeaders.CONTENT_TYPE + "=" + MediaType.APPLICATION_FORM_URLENCODED_VALUE
-            },
-            produces = MediaType.APPLICATION_JSON_VALUE
+        value = {"/integration/slack", "/jokes/slack"},
+        method = RequestMethod.POST,
+        headers = {
+            HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
+            HttpHeaders.CONTENT_TYPE + "=" + MediaType.APPLICATION_FORM_URLENCODED_VALUE
+        },
+        produces = MediaType.APPLICATION_JSON_VALUE
     )
     public @ResponseBody
     SlackResponse command(Request request) {
