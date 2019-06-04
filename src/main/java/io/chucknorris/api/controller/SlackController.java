@@ -74,7 +74,7 @@ public class SlackController {
     }
 
     @RequestMapping(
-            value = "/integration/slack",
+            value = {"/integration/slack", "/jokes/slack"},
             method = RequestMethod.POST,
             headers = {
                     HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
