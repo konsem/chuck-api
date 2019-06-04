@@ -1,8 +1,6 @@
-[![Donate to this project using patreon.com](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/matchilling)
+[![Donate to this project using patreon.com](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/matchilling) [![Build Status](https://travis-ci.org/chucknorris-io/chuck-api.svg?branch=master)](https://travis-ci.org/chucknorris-io/chuck-api)
 
 # CHUCKNORRIS.IO
-
-JSON API for random [Chuck Norris jokes](https://api.chucknorris.io).
 
 [chucknorris.io](https://api.chucknorris.io) is a free JSON API for hand curated Chuck Norris facts.
 
@@ -17,83 +15,57 @@ beard, and his role in the action television series Walker, Texas Ranger.
 
 ## Usage
 
-```sh
-// Retrieve a random chuck joke
+```shell
+# Retrieve a random chuck joke
 $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/random' \
        --header 'accept: (application/json|text/plain)'
 
-// Add an optional `category` parameter to get a random joke from the given category
+# Add an optional `category` parameter to get a random joke from the given category
 $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/random?category=dev' \
        --header 'accept: (application/json|text/plain)'
 
-// Retrieve a list of available categories
+# Retrieve a list of available categories
 $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/categories' \
        --header 'accept: (application/json|text/plain)'
 
-// Free text search
+# Free text search
 $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/search?query={query}' \
        --header 'accept: (application/json|text/plain)'
-
-// Create a new joke
-$ curl --request POST \
-       --url https://api.chucknorris.io/jokes \
-       --header 'accept: application/json' \
-       --header 'authorization: Bearer {token}' \
-       --header 'content-type: application/json' \
-       --data '{
-         "categories": [ "dev" ],
-         "value": "Everybody thinks the Galaxy Note 7 is explosive. In fact it is only Chuck Norris who tries to send a WhatsApp message with a selfie to his fans." }'
-
-// Update an existing joke
-$ curl --request PUT \
-       --url https://api.chucknorris.io/jokes/{joke_id} \
-       --header 'accept: application/json' \
-       --header 'authorization: Bearer {token}' \
-       --header 'content-type: application/json' \
-       --data '{ "categories": [ "food" ] }'
 ```
 
 Example response:
+
 ```json
 {
-    "category" : [
-        "dev"
-    ],
-    "icon_url" : "https://assets.chucknorris.host/img/avatar/chuck-norris.png",
-    "id"       : "ye0_hnd3rgq68e_pfvsqqg",
-    "url"      : "https://api.chucknorris.io/jokes/ye0_hnd3rgq68e_pfvsqqg",
-    "value"    : "Chuck Norris can instantiate an abstract class."
+  "categories": ["dev"],
+  "created_at": "2019-06-02 08:47:39.43184",
+  "icon_url": "https://assets.chucknorris.host/img/avatar/chuck-norris.png",
+  "id": "bwoz2uwsqnwmyawyxdvo1w",
+  "updated_at": "2019-06-02 08:47:39.43184",
+  "url": "https://api.chucknorris.io/jokes/bwoz2uwsqnwmyawyxdvo1w",
+  "value": "Chuck Norris finished World of Warcraft."
 }
 ```
 
+For more examples check the [Swagger documentation](https://api.chucknorris.io/documentation) and have a look into the [Postman collection](./postman/io.chucknorris.api.postman_collection.json).
+
 ## Local development
 
-To start the stack using docker you need to set a couple of environment variables which are defined in an env file in the root directory of the project. All required variable identifiers are shipped in the [.env.dist](./.end.dist) file which you can use as an example.
+To start the stack using docker you need to set a couple of environment variables which are defined in an env file in the root directory of the project. All required variable identifiers are shipped in the [application-example.properties](./src/main/resources/application-example.properties) file which you can use as an example.
 
 ```sh
 $ docker-compose up     # Will run as a long running process
 $ docker-compose up -d  # Will run in background
 ```
 
-### Accessing the applications
+**Urls:**
 
-By default only two ports of the complete stack are exposed to your localhost, those are:
-  - `80`
-  - `443`
-
-### Viewing the stack logs
-
-As long as your are inside the project's root directory you can run one of the following to see the container logs:
-
-```sh
-$ docker-compose logs     # Equivalent to tail -f and show all containers
-$ docker-compose logs web # Will only show logs for the nginx container
-$ docker-compose logs api # Will only show logs for the api container
-```
+- API: [http://localhost:8080](http://localhost:8080)
+- Swagger UI: [http://localhost:4567](http://localhost:4567)
 
 ## License
 
