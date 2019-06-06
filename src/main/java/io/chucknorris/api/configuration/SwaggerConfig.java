@@ -14,9 +14,11 @@ public class SwaggerConfig {
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("io.chucknorris.api.controller"))
-                .paths(PathSelectors.ant("/jokes/*"))
-                .build();
+            .select()
+            .apis(RequestHandlerSelectors.basePackage("io.chucknorris.api.controller"))
+            .paths(
+                PathSelectors.ant("/jokes/*")
+            )
+            .build();
     }
 }

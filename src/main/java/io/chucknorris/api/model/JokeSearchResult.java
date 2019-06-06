@@ -17,19 +17,19 @@ public class JokeSearchResult implements Serializable {
         this.result = jokes;
     }
 
-    public Joke[] getResult() {
-        return result;
-    }
-
-    public void setResult(Joke[] jokes) {
-        this.result = jokes;
-    }
-
     public int getTotal() {
         return total;
     }
 
+    public Joke[] getResult() {
+        return result;
+    }
+
     public void setTotal(int total) {
         this.total = total;
+    }
+
+    public void setResult(Joke[] result) {
+        this.result = result;
     }
 }
