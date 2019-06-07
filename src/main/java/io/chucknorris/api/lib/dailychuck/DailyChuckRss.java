@@ -47,7 +47,7 @@ public class DailyChuckRss extends AbstractRssFeedView {
         Long issueNumber = dailyChuck.getIssueNumber();
         Item entry = new Item();
         entry.setTitle(issueNumber.toString());
-        entry.setLink("https://" + baseUrl + joke.getUrl());
+        entry.setLink("https://" + baseUrl + "/jokes/" + joke.getId());
         entry.setPubDate(currentIssue.getDate());
 
         Content content = new Content();
