@@ -6,6 +6,8 @@ import io.chucknorris.api.lib.dailychuck.DailyChuckIssue;
 import io.chucknorris.api.lib.dailychuck.DailyChuckPublishedEvent;
 import io.chucknorris.api.lib.dailychuck.DailyChuckService;
 import io.chucknorris.api.lib.event.EventService;
+import java.io.IOException;
+import java.util.Date;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,67 +15,81 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.View;
 
-import java.io.IOException;
-import java.util.Date;
-
 @RestController
 public class FeedController {
 
-    DailyChuckService dailyChuckService;
-    DateUtil dateUtil;
-    EventService eventService;
+  DailyChuckService dailyChuckService;
+  DateUtil dateUtil;
+  EventService eventService;
 
-    public FeedController(DailyChuckService dailyChuckService, DateUtil dateUtil, EventService eventService) {
-        this.dailyChuckService = dailyChuckService;
-        this.dateUtil = dateUtil;
-        this.eventService = eventService;
+  /**
+   * Returns a new FeedController {@link FeedController} instance.
+   */
+  public FeedController(
+      DailyChuckService dailyChuckService, DateUtil dateUtil, EventService eventService
+  ) {
+    this.dailyChuckService = dailyChuckService;
+    this.dateUtil = dateUtil;
+    this.eventService = eventService;
+  }
+
+  /**
+   * Returns a new DailyChuck {@link DailyChuck} instance.
+   *
+   * @return dailyChuck
+   * @throws IOException Thrown if {@link DailyChuck} can't ber persisted.
+   */
+  public @RequestMapping(
+      value = {"/feed/daily-chuck.json", "/feed/daily-chuck"},
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  ) DailyChuck dailyChuckJson() throws IOException {
+    DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
+
+    Date now = dateUtil.now();
+    if (dailyChuck.findIssueByDate(now) instanceof DailyChuckIssue) {
+      return dailyChuck;
     }
 
-    @RequestMapping(
-        value = {"/feed/daily-chuck.json", "/feed/daily-chuck"},
-        method = RequestMethod.GET,
-        headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public DailyChuck dailyChuckJson() throws IOException {
-        DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
+    DailyChuckIssue dailyChuckIssue = dailyChuckService
+        .composeDailyChuckIssue(dailyChuck.getIssues());
+    dailyChuck.addIssue(dailyChuckIssue);
 
-        Date now = dateUtil.now();
-        if (dailyChuck.findIssueByDate(now) instanceof DailyChuckIssue) {
-            return dailyChuck;
-        }
+    dailyChuckService.persist(dailyChuck);
 
-        DailyChuckIssue dailyChuckIssue = dailyChuckService.composeDailyChuckIssue(dailyChuck.getIssues());
-        dailyChuck.addIssue(dailyChuckIssue);
+    eventService.publishEvent(new DailyChuckPublishedEvent(dailyChuckIssue));
 
-        dailyChuckService.persist(dailyChuck);
+    return dailyChuck;
+  }
 
-        eventService.publishEvent(new DailyChuckPublishedEvent(dailyChuckIssue));
+  /**
+   * Returns the current DailyChuck in RSS format.
+   *
+   * @return dailyChuck
+   * @throws IOException Thrown if {@link DailyChuck} can't ber persisted.
+   */
+  public @RequestMapping(
+      value = {"/feed/daily-chuck.xml", "/feed/daily-chuck"},
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_XML_VALUE,
+      produces = MediaType.APPLICATION_RSS_XML_VALUE
+  ) View dailyChuckRss() throws IOException {
+    DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
 
-        return dailyChuck;
+    Date now = dateUtil.now();
+    if (dailyChuck.findIssueByDate(now) instanceof DailyChuckIssue) {
+      return dailyChuckService.toRss(dailyChuck);
     }
 
-    @RequestMapping(
-        value = {"/feed/daily-chuck.xml", "/feed/daily-chuck"},
-        method = RequestMethod.GET,
-        headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_XML_VALUE,
-        produces = MediaType.APPLICATION_RSS_XML_VALUE
-    )
-    public View dailyChuckRss() throws IOException {
-        DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
+    DailyChuckIssue dailyChuckIssue = dailyChuckService
+        .composeDailyChuckIssue(dailyChuck.getIssues());
+    dailyChuck.addIssue(dailyChuckIssue);
 
-        Date now = dateUtil.now();
-        if (dailyChuck.findIssueByDate(now) instanceof DailyChuckIssue) {
-            return dailyChuckService.toRss(dailyChuck);
-        }
+    dailyChuckService.persist(dailyChuck);
 
-        DailyChuckIssue dailyChuckIssue = dailyChuckService.composeDailyChuckIssue(dailyChuck.getIssues());
-        dailyChuck.addIssue(dailyChuckIssue);
+    eventService.publishEvent(new DailyChuckPublishedEvent(dailyChuckIssue));
 
-        dailyChuckService.persist(dailyChuck);
-
-        eventService.publishEvent(new DailyChuckPublishedEvent(dailyChuckIssue));
-
-        return dailyChuckService.toRss(dailyChuck);
-    }
+    return dailyChuckService.toRss(dailyChuck);
+  }
 }

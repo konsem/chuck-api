@@ -151,7 +151,7 @@ public class JokeControllerTest {
 
   @Test(expected = EntityNotFoundException.class)
   public void testGetRandomJokeReturnsJokeByCategoryThrowsException() {
-    when(jokeRepository.findAllCategories()).thenReturn(new String[]{});
+      when(jokeRepository.findAllCategories()).thenReturn(new String[]{});
 
     jokeController.getRandomJoke("dev");
 

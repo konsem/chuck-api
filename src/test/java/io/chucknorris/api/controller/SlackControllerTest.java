@@ -2,7 +2,7 @@ package io.chucknorris.api.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.chucknorris.api.lib.event.EventService;
-import io.chucknorris.api.lib.slack.Impl.*;
+import io.chucknorris.api.lib.slack.impl.*;
 import io.chucknorris.api.lib.slack.SlackResponse;
 import io.chucknorris.api.model.Joke;
 import io.chucknorris.api.repository.JokeRepository;

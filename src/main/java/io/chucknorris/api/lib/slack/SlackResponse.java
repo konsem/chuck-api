@@ -1,13 +1,14 @@
 package io.chucknorris.api.lib.slack;
 
-import io.chucknorris.api.lib.slack.Impl.ResponseAttachment;
+import io.chucknorris.api.lib.slack.impl.ResponseAttachment;
 
 public interface SlackResponse {
-    ResponseAttachment[] getAttachments();
 
-    String getIconUrl();
+  ResponseAttachment[] getAttachments();
 
-    String getResponseType();
+  String getIconUrl();
 
-    String getText();
+  String getResponseType();
+
+  String getText();
 }

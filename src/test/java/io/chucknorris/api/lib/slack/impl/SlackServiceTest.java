@@ -1,4 +1,4 @@
-package io.chucknorris.api.lib.slack.Impl;
+package io.chucknorris.api.lib.slack.impl;
 
 import org.junit.Before;
 import org.junit.Test;

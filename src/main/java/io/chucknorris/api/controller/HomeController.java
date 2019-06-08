@@ -1,6 +1,6 @@
 package io.chucknorris.api.controller;
 
-import io.chucknorris.api.lib.slack.Impl.SlackService;
+import io.chucknorris.api.lib.slack.impl.SlackService;
 import io.chucknorris.api.repository.JokeRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -11,25 +11,31 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class HomeController {
-    private JokeRepository jokeRepository;
-    private SlackService slackService;
 
-    public HomeController(JokeRepository jokeRepository, SlackService slackService) {
-        this.jokeRepository = jokeRepository;
-        this.slackService = slackService;
-    }
+  private JokeRepository jokeRepository;
+  private SlackService slackService;
 
-    @RequestMapping(
-            value = "/",
-            method = RequestMethod.GET,
-            headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_HTML_VALUE,
-            produces = MediaType.TEXT_HTML_VALUE
-    )
-    public ModelAndView view() {
-        ModelAndView model = new ModelAndView("home");
-        model.addObject("joke", jokeRepository.getRandomJoke());
-        model.addObject("slack_authorize_url", slackService.composeAuthorizeUri());
+  /**
+   * Instantiates a new HomeController {@link HomeController}.
+   */
+  public HomeController(JokeRepository jokeRepository, SlackService slackService) {
+    this.jokeRepository = jokeRepository;
+    this.slackService = slackService;
+  }
 
-        return model;
-    }
+  /**
+   * Returns the model for the home view.
+   */
+  public @RequestMapping(
+      value = "/",
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_HTML_VALUE,
+      produces = MediaType.TEXT_HTML_VALUE
+  ) ModelAndView view() {
+    ModelAndView modelAndView = new ModelAndView("home");
+    modelAndView.addObject("joke", jokeRepository.getRandomJoke());
+    modelAndView.addObject("slack_authorize_url", slackService.composeAuthorizeUri());
+
+    return modelAndView;
+  }
 }

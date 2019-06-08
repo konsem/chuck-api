@@ -4,182 +4,214 @@ import io.chucknorris.api.exception.EntityNotFoundException;
 import io.chucknorris.api.model.Joke;
 import io.chucknorris.api.model.JokeSearchResult;
 import io.chucknorris.api.repository.JokeRepository;
+import java.util.Arrays;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.Size;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.Size;
-import java.util.Arrays;
 
 @RequestMapping(value = "/jokes")
 @RestController
 @Validated
 public class JokeController {
-    private JokeRepository jokeRepository;
 
-    public JokeController(JokeRepository jokeRepository) {
-        this.jokeRepository = jokeRepository;
+  private JokeRepository jokeRepository;
+
+  /**
+   * Returns a new JokeController {@link JokeController} instance.
+   */
+  public JokeController(JokeRepository jokeRepository) {
+    this.jokeRepository = jokeRepository;
+  }
+
+  @RequestMapping(
+      value = "/categories",
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  )
+  public @ResponseBody
+  String[] getCategories() {
+    return jokeRepository.findAllCategories();
+  }
+
+  /**
+   * Returns all joke categories delimited by a new line.
+   */
+  public @ResponseBody @RequestMapping(
+      value = "/categories",
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_PLAIN_VALUE,
+      produces = MediaType.TEXT_PLAIN_VALUE
+  ) String getCategoryValues() {
+    StringBuilder stringBuilder = new StringBuilder();
+
+    for (String category : jokeRepository.findAllCategories()) {
+      stringBuilder.append(category + '\n');
     }
 
-    @RequestMapping(
-        value = "/categories",
-        method = RequestMethod.GET,
-        headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public @ResponseBody
-    String[] getCategories() {
-        return jokeRepository.findAllCategories();
+    return stringBuilder.toString();
+  }
+
+  /**
+   * Returns a Joke {@link Joke} by id.
+   *
+   * @param id The joke id
+   * @return joke
+   */
+  public @ResponseBody @RequestMapping(
+      value = "/{id}",
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  ) Joke getJoke(@PathVariable String id) {
+    return jokeRepository.findById(id).orElseThrow(
+        () -> new EntityNotFoundException("Joke with id \"" + id + "\" not found.")
+    );
+  }
+
+  /**
+   * Returns a joke value by id.
+   *
+   * @param id The joke id
+   * @return string
+   */
+  public @ResponseBody @RequestMapping(
+      value = "/{id}",
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_PLAIN_VALUE,
+      produces = MediaType.TEXT_PLAIN_VALUE
+  ) String getJokeValue(@PathVariable String id, HttpServletResponse response) {
+    try {
+      return jokeRepository.findById(id).orElseThrow(
+          () -> new EntityNotFoundException("Joke with id \"" + id + "\" not found.")
+      ).getValue();
+    } catch (EntityNotFoundException e) {
+      response.setStatus(HttpStatus.NOT_FOUND.value());
+      return "";
+    }
+  }
+
+  /**
+   * Returns the model for the joke view.
+   */
+  public @RequestMapping(
+      value = "/{id}",
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_HTML_VALUE,
+      produces = MediaType.TEXT_HTML_VALUE
+  ) ModelAndView getJokeView(@PathVariable String id) {
+    Joke joke = jokeRepository.findById(id).orElseThrow(
+        () -> new EntityNotFoundException("Joke with id \"" + id + "\" not found.")
+    );
+
+    String[] ids = jokeRepository.getJokeWindow(id).split(",");
+
+    ModelAndView model = new ModelAndView("joke");
+    model.addObject("joke", joke);
+    model.addObject("next_joke_url", "/jokes/" + ids[1]);
+    model.addObject("current_joke_url", "/jokes/" + id);
+    model.addObject("prev_joke_url", "/jokes/" + ids[2]);
+
+    return model;
+  }
+
+  /**
+   * Returns a random Joke {@link Joke}.
+   *
+   * @return joke
+   */
+  public @ResponseBody @RequestMapping(
+      value = "/random",
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  ) Joke getRandomJoke(@RequestParam(value = "category", required = false) final String category) {
+    if (category == null) {
+      return jokeRepository.getRandomJoke();
     }
 
-    @RequestMapping(
-        value = "/categories",
-        method = RequestMethod.GET,
-        headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_PLAIN_VALUE,
-        produces = MediaType.TEXT_PLAIN_VALUE
-    )
-    public @ResponseBody
-    String getCategoryValues() {
-        StringBuilder stringBuilder = new StringBuilder();
+    String[] categories = jokeRepository.findAllCategories();
+    if (!Arrays.asList(categories).contains(category)) {
+      throw new EntityNotFoundException("No jokes for category \"" + category + "\" found.");
+    } else {
+      return jokeRepository.getRandomJokeByCategory(category);
+    }
+  }
 
-        for (String category : jokeRepository.findAllCategories()) {
-            stringBuilder.append(category + '\n');
-        }
-
-        return stringBuilder.toString();
+  /**
+   * Returns a random joke value.
+   *
+   * @return string
+   */
+  public @ResponseBody @RequestMapping(
+      value = "/random",
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_PLAIN_VALUE,
+      produces = MediaType.TEXT_PLAIN_VALUE
+  ) String getRandomJokeValue(
+      @RequestParam(value = "category", required = false) final String category,
+      HttpServletResponse response) {
+    if (category == null) {
+      return jokeRepository.getRandomJoke().getValue();
     }
 
-    @RequestMapping(
-        value = "/{id}",
-        method = RequestMethod.GET,
-        headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public @ResponseBody
-    Joke getJoke(@PathVariable String id) {
-        return jokeRepository.findById(id).orElseThrow(
-            () -> new EntityNotFoundException("Joke with id \"" + id + "\" not found.")
-        );
+    String[] categories = jokeRepository.findAllCategories();
+    if (!Arrays.asList(categories).contains(category)) {
+      response.setStatus(HttpStatus.NOT_FOUND.value());
+      return "";
+    } else {
+      return jokeRepository.getRandomJokeByCategory(category).getValue();
+    }
+  }
+
+  /**
+   * Returns a JokeSearchResult {@link JokeSearchResult}.
+   *
+   * @param query The search query
+   * @return jokeSearchResult
+   */
+  public @ResponseBody @RequestMapping(
+      value = "/search",
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
+      produces = MediaType.APPLICATION_JSON_VALUE
+  ) JokeSearchResult search(
+      @RequestParam(value = "query")
+      @Size(min = 3, max = 120) final String query
+  ) {
+    Joke[] jokes = jokeRepository.searchByQuery(query);
+    return new JokeSearchResult(jokes);
+  }
+
+  /**
+   * Returns a search result delimited by a new line.
+   */
+  public @ResponseBody @RequestMapping(
+      value = "/search",
+      method = RequestMethod.GET,
+      headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_PLAIN_VALUE,
+      produces = MediaType.TEXT_PLAIN_VALUE
+  ) String searchValues(
+      @RequestParam(value = "query")
+      @Size(min = 3, max = 120) final String query
+  ) {
+    Joke[] jokes = jokeRepository.searchByQuery(query);
+    StringBuilder stringBuilder = new StringBuilder();
+
+    for (Joke joke : jokes) {
+      stringBuilder.append(joke.getValue() + '\n');
     }
 
-    @RequestMapping(
-        value = "/{id}",
-        method = RequestMethod.GET,
-        headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_PLAIN_VALUE,
-        produces = MediaType.TEXT_PLAIN_VALUE
-    )
-    public @ResponseBody
-    String getJokeValue(@PathVariable String id, HttpServletResponse response) {
-        try {
-            return jokeRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Joke with id \"" + id + "\" not found.")
-            ).getValue();
-        } catch (EntityNotFoundException e) {
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            return "";
-        }
-    }
-
-    @RequestMapping(
-        value = "/{id}",
-        method = RequestMethod.GET,
-        headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_HTML_VALUE,
-        produces = MediaType.TEXT_HTML_VALUE
-    )
-    public ModelAndView getJokeView(@PathVariable String id) {
-        Joke joke = jokeRepository.findById(id).orElseThrow(
-            () -> new EntityNotFoundException("Joke with id \"" + id + "\" not found.")
-        );
-
-        String[] ids = jokeRepository.getJokeWindow(id).split(",");
-
-        ModelAndView model = new ModelAndView("joke");
-        model.addObject("joke", joke);
-        model.addObject("next_joke_url", "/jokes/" + ids[1]);
-        model.addObject("current_joke_url", "/jokes/" + id);
-        model.addObject("prev_joke_url", "/jokes/" + ids[2]);
-
-        return model;
-    }
-
-    @RequestMapping(
-        value = "/random",
-        method = RequestMethod.GET,
-        headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public @ResponseBody
-    Joke getRandomJoke(@RequestParam(value = "category", required = false) final String category) {
-        if (category == null) {
-            return jokeRepository.getRandomJoke();
-        }
-
-        String[] categories = jokeRepository.findAllCategories();
-        if (!Arrays.asList(categories).contains(category)) {
-            throw new EntityNotFoundException("No jokes for category \"" + category + "\" found.");
-        } else {
-            return jokeRepository.getRandomJokeByCategory(category);
-        }
-    }
-
-    @RequestMapping(
-        value = "/random",
-        method = RequestMethod.GET,
-        headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_PLAIN_VALUE,
-        produces = MediaType.TEXT_PLAIN_VALUE
-    )
-    public @ResponseBody
-    String getRandomJokeValue(@RequestParam(value = "category", required = false) final String category, HttpServletResponse response) {
-        if (category == null) {
-            return jokeRepository.getRandomJoke().getValue();
-        }
-
-        String[] categories = jokeRepository.findAllCategories();
-        if (!Arrays.asList(categories).contains(category)) {
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            return "";
-        } else {
-            return jokeRepository.getRandomJokeByCategory(category).getValue();
-        }
-    }
-
-    @RequestMapping(
-        value = "/search",
-        method = RequestMethod.GET,
-        headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
-        produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public @ResponseBody
-    JokeSearchResult search(
-        @RequestParam(value = "query")
-        @Size(min = 3, max = 120) final String query
-    ) {
-        Joke[] jokes = jokeRepository.searchByQuery(query);
-        return new JokeSearchResult(jokes);
-    }
-
-    @RequestMapping(
-        value = "/search",
-        method = RequestMethod.GET,
-        headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_PLAIN_VALUE,
-        produces = MediaType.TEXT_PLAIN_VALUE
-    )
-    public @ResponseBody
-    String searchValues(
-        @RequestParam(value = "query")
-        @Size(min = 3, max = 120) final String query
-    ) {
-        Joke[] jokes = jokeRepository.searchByQuery(query);
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for (Joke joke : jokes) {
-            stringBuilder.append(joke.getValue() + '\n');
-        }
-
-        return stringBuilder.toString();
-    }
+    return stringBuilder.toString();
+  }
 }
