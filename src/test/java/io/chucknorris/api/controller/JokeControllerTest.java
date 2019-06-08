@@ -160,6 +160,31 @@ public class JokeControllerTest {
   }
 
   @Test
+  public void testGetRandomJokeReturnsJokeByMultipleCategories() {
+    when(jokeRepository.getRandomJokeByCategories("dev,movie")).thenReturn(joke);
+    when(jokeRepository.findAllCategories()).thenReturn(new String[]{"dev", "movie"});
+
+    Joke joke = jokeController.getRandomJoke("dev,movie");
+    assertEquals(JokeControllerTest.joke, joke);
+
+    verify(jokeRepository, times(1)).findAllCategories();
+    verify(jokeRepository, times(1)).getRandomJokeByCategories(
+        "dev,movie"
+    );
+    verifyNoMoreInteractions(jokeRepository);
+  }
+
+  @Test(expected = EntityNotFoundException.class)
+  public void testGetRandomJokeReturnsJokeByMultipleCategoriesThrowsException() {
+    when(jokeRepository.findAllCategories()).thenReturn(new String[]{});
+
+    jokeController.getRandomJoke("dev,does-not-exist");
+
+    verify(jokeRepository, times(1)).findAllCategories();
+    verifyNoMoreInteractions(jokeRepository);
+  }
+
+  @Test
   public void testGetRandomJokeReturnsJokeValue() {
     when(jokeRepository.getRandomJoke()).thenReturn(joke);
 
@@ -180,6 +205,21 @@ public class JokeControllerTest {
 
     verify(jokeRepository, times(1)).findAllCategories();
     verify(jokeRepository, times(1)).getRandomJokeByCategory("dev");
+    verifyNoMoreInteractions(jokeRepository);
+  }
+
+  @Test
+  public void testGetRandomJokeReturnsJokeValueByMultipleCategories() {
+    when(jokeRepository.getRandomJokeByCategories("dev,movie")).thenReturn(joke);
+    when(jokeRepository.findAllCategories()).thenReturn(new String[]{"dev", "movie"});
+
+    String jokeValue = jokeController.getRandomJokeValue("dev,movie", this.httpServletResponse);
+    assertEquals(joke.getValue(), jokeValue);
+
+    verify(jokeRepository, times(1)).findAllCategories();
+    verify(jokeRepository, times(1)).getRandomJokeByCategories(
+        "dev,movie"
+    );
     verifyNoMoreInteractions(jokeRepository);
   }
 

@@ -1188,6 +1188,163 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "/jokes/random with categories (json)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "670a9e46-d8a4-4c21-8a33-d409a7efb4cb",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Headers are correct\", function () {",
+									"  pm.response.to.be.header(",
+									"    \"Access-Control-Allow-Origin\",",
+									"    \"*\"",
+									"  );",
+									"  pm.response.to.be.header(",
+									"    \"Access-Control-Allow-Credentials\",",
+									"    \"true\"",
+									"  );",
+									"  pm.response.to.be.header(",
+									"    \"Content-Type\",",
+									"    \"application/json;charset=UTF-8\"",
+									"  );",
+									"});",
+									"",
+									"pm.test('Schema is valid', function() {",
+									"  pm.expect(tv4.validate(",
+									"    pm.response.json(),",
+									"    pm.environment.get(\"schema\").definitions['Joke']",
+									"  )).to.be.true;",
+									"});",
+									"",
+									"pm.test(\"Has categories = ['dev'] or ['movie']\", function () {",
+									"  var jsonData = pm.response.json();",
+									"  pm.expect(jsonData.categories).satisfy(category => {",
+									"      return (category[0] === 'dev') || category[0] === 'movie'",
+									"  });",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "98dbb6d3-2154-4a5b-a150-9f161c72434c",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"description": "The Origin request header indicates where a fetch originates from. It doesn't include any path information, but only the server name. It is sent with CORS requests, as well as with POST requests. It is similar to the Referer header, but, unlike this header, it doesn't disclose the whole path.",
+								"key": "Origin",
+								"type": "text",
+								"value": "*"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/jokes/random?category=dev,movie",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"jokes",
+								"random"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "dev,movie"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/jokes/random with categories (text)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "670a9e46-d8a4-4c21-8a33-d409a7efb4cb",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"  pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Headers are correct\", function () {",
+									"  pm.response.to.be.header(",
+									"    \"Access-Control-Allow-Origin\",",
+									"    \"*\"",
+									"  );",
+									"  pm.response.to.be.header(",
+									"    \"Access-Control-Allow-Credentials\",",
+									"    \"true\"",
+									"  );",
+									"  pm.response.to.be.header(",
+									"    \"Content-Type\",",
+									"    \"text/plain;charset=UTF-8\"",
+									"  );",
+									"});",
+									"",
+									"pm.test(\"Has a non-empty body\", function () {",
+									"  pm.expect(pm.response.text().length).to.be.above(0);",
+									"});",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/plain"
+							},
+							{
+								"description": "The Origin request header indicates where a fetch originates from. It doesn't include any path information, but only the server name. It is sent with CORS requests, as well as with POST requests. It is similar to the Referer header, but, unlike this header, it doesn't disclose the whole path.",
+								"key": "Origin",
+								"type": "text",
+								"value": "*"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/jokes/random?category=dev,movie",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"jokes",
+								"random"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "dev,movie"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -1264,7 +1421,99 @@
 						},
 						"description": "Retrieve a list of available joke categories."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "/jokes/categories (json)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/json"
+									},
+									{
+										"key": "Origin",
+										"value": "*",
+										"description": "The Origin request header indicates where a fetch originates from. It doesn't include any path information, but only the server name. It is sent with CORS requests, as well as with POST requests. It is similar to the Referer header, but, unlike this header, it doesn't disclose the whole path.",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/jokes/categories",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"jokes",
+										"categories"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sat, 08 Jun 2019 09:50:25 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json;charset=UTF-8"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Method"
+								},
+								{
+									"key": "Vary",
+									"value": "Access-Control-Request-Headers"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*"
+								},
+								{
+									"key": "Access-Control-Allow-Credentials",
+									"value": "true"
+								},
+								{
+									"key": "Via",
+									"value": "1.1 vegur"
+								},
+								{
+									"key": "Expect-CT",
+									"value": "max-age=604800, report-uri=\"https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct\""
+								},
+								{
+									"key": "Server",
+									"value": "cloudflare"
+								},
+								{
+									"key": "CF-RAY",
+									"value": "4e39f61e2a44d10d-TXL"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip"
+								}
+							],
+							"cookie": [],
+							"body": "[\n    \"animal\",\n    \"career\",\n    \"celebrity\",\n    \"dev\",\n    \"explicit\",\n    \"fashion\",\n    \"food\",\n    \"history\",\n    \"money\",\n    \"movie\",\n    \"music\",\n    \"political\",\n    \"religion\",\n    \"science\",\n    \"sport\",\n    \"travel\"\n]"
+						}
+					]
 				},
 				{
 					"name": "/jokes/categories (text)",

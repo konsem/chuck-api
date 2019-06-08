@@ -5,6 +5,7 @@ import io.chucknorris.api.model.Joke;
 import io.chucknorris.api.model.JokeSearchResult;
 import io.chucknorris.api.repository.JokeRepository;
 import java.util.Arrays;
+import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.Size;
 import org.springframework.http.HttpHeaders;
@@ -39,7 +40,7 @@ public class JokeController {
       headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public @ResponseBody
+    public @ResponseBody
   String[] getCategories() {
     return jokeRepository.findAllCategories();
   }
@@ -135,17 +136,22 @@ public class JokeController {
       method = RequestMethod.GET,
       headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE
-  ) Joke getRandomJoke(@RequestParam(value = "category", required = false) final String category) {
-    if (category == null) {
+  ) Joke getRandomJoke(@RequestParam(value = "category", required = false) String categoryString) {
+    if (categoryString == null) {
       return jokeRepository.getRandomJoke();
     }
 
-    String[] categories = jokeRepository.findAllCategories();
-    if (!Arrays.asList(categories).contains(category)) {
-      throw new EntityNotFoundException("No jokes for category \"" + category + "\" found.");
-    } else {
-      return jokeRepository.getRandomJokeByCategory(category);
+    String[] availableCategories = jokeRepository.findAllCategories();
+    List<String> categories = Arrays.asList(categoryString.split(","));
+    for (String category: categories) {
+      if (!Arrays.asList(availableCategories).contains(category)) {
+        throw new EntityNotFoundException("No jokes for category \"" + category + "\" found.");
+      }
     }
+
+    return categories.size() <= 1
+      ? jokeRepository.getRandomJokeByCategory(categories.get(0))
+      : jokeRepository.getRandomJokeByCategories(categoryString);
   }
 
   /**
@@ -159,19 +165,25 @@ public class JokeController {
       headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_PLAIN_VALUE,
       produces = MediaType.TEXT_PLAIN_VALUE
   ) String getRandomJokeValue(
-      @RequestParam(value = "category", required = false) final String category,
-      HttpServletResponse response) {
-    if (category == null) {
+      @RequestParam(value = "category", required = false) final String categoryString,
+      HttpServletResponse response
+  ) {
+    if (categoryString == null) {
       return jokeRepository.getRandomJoke().getValue();
     }
 
-    String[] categories = jokeRepository.findAllCategories();
-    if (!Arrays.asList(categories).contains(category)) {
-      response.setStatus(HttpStatus.NOT_FOUND.value());
-      return "";
-    } else {
-      return jokeRepository.getRandomJokeByCategory(category).getValue();
+    String[] availableCategories = jokeRepository.findAllCategories();
+    List<String> categories = Arrays.asList(categoryString.split(","));
+    for (String category: categories) {
+      if (!Arrays.asList(availableCategories).contains(category)) {
+        response.setStatus(HttpStatus.NOT_FOUND.value());
+        return "";
+      }
     }
+
+    return categories.size() <= 1
+        ? jokeRepository.getRandomJokeByCategory(categories.get(0)).getValue()
+        : jokeRepository.getRandomJokeByCategories(categoryString).getValue();
   }
 
   /**
