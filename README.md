@@ -21,9 +21,9 @@ $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/random' \
        --header 'accept: (application/json|text/plain)'
 
-# Retrieve a random chuck joke from a given category
+# Retrieve a random chuck joke by one or more categories
 $ curl --request GET \
-       --url 'https://api.chucknorris.io/jokes/random?category=dev' \
+       --url 'https://api.chucknorris.io/jokes/random?category=dev,explicit' \
        --header 'accept: (application/json|text/plain)'
 
 # Retrieve a random personalized chuck joke
@@ -31,9 +31,9 @@ $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/random?name=Bob' \
        --header 'accept: (application/json|text/plain)'
 
-# Add an optional `category` parameter to get a random joke from the given category
+# Retrieve a random personalized chuck joke by one or more categories
 $ curl --request GET \
-       --url 'https://api.chucknorris.io/jokes/random?category=dev' \
+       --url 'https://api.chucknorris.io/jokes/random?name=Bob&category=dev,explicit' \
        --header 'accept: (application/json|text/plain)'
 
 # Retrieve a list of available categories

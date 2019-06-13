@@ -205,6 +205,35 @@ public class JokeControllerTest {
     verifyNoMoreInteractions(jokeRepository);
   }
 
+  @Test
+  public void testGetRandomPersonalisedJokeByCategoryReturnsJoke() {
+    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    when(jokeRepository.findAllCategories()).thenReturn(new String[]{"dev"});
+    when(jokeRepository.getRandomPersonalizedJokeByCategories(
+        "Bob", "dev"
+    )).thenReturn(joke);
+
+    Joke joke = jokeController.getRandomJoke("dev", "Bob");
+    assertEquals(JokeControllerTest.joke, joke);
+
+    verify(jokeRepository, times(1)).findAllCategories();
+    verify(jokeRepository, times(1)).getRandomPersonalizedJokeByCategories(
+        "Bob", "dev"
+    );
+    verifyNoMoreInteractions(jokeRepository);
+  }
+
+  @Test(expected = EntityNotFoundException.class)
+  public void testGetRandomPersonalisedJokeByCategoryThrowsException() {
+    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    when(jokeRepository.findAllCategories()).thenReturn(new String[]{"dev"});
+    when(jokeRepository.getRandomPersonalizedJokeByCategories(
+        "Bob", "dev"
+    )).thenReturn(null);
+
+    jokeController.getRandomJoke("dev", "Bob");
+  }
+
   @Test(expected = EntityNotFoundException.class)
   public void testGetRandomPersonalisedJokeThrowsException() {
     joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
@@ -300,6 +329,39 @@ public class JokeControllerTest {
     assertEquals("", jokeValue);
 
     verify(jokeRepository, times(1)).getRandomPersonalizedJoke("Bob");
+    verify(this.httpServletResponse).setStatus(404);
+    verifyNoMoreInteractions(jokeRepository);
+  }
+
+  @Test
+  public void testGetRandomPersonalisedJokeValueByCategoryReturnsJokeValue() {
+    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    when(jokeRepository.findAllCategories()).thenReturn(new String[]{"dev"});
+    when(jokeRepository.getRandomPersonalizedJokeByCategories("Bob", "dev")).thenReturn(joke);
+
+    String jokeValue = jokeController.getRandomJokeValue(
+        "dev", "Bob", this.httpServletResponse
+    );
+    assertEquals(joke.getValue(), jokeValue);
+
+    verify(jokeRepository, times(1)).findAllCategories();
+    verify(jokeRepository, times(1)).getRandomPersonalizedJokeByCategories("Bob", "dev");
+    verifyNoMoreInteractions(jokeRepository);
+  }
+
+  @Test
+  public void testGetRandomPersonalisedJokeValueByCategoryEmptyStringIfNoJokeWasFound() {
+    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    when(jokeRepository.findAllCategories()).thenReturn(new String[]{"dev"});
+    when(jokeRepository.getRandomPersonalizedJokeByCategories("Bob", "dev")).thenReturn(null);
+
+    String jokeValue = jokeController.getRandomJokeValue(
+        "dev", "Bob", this.httpServletResponse
+    );
+    assertEquals("", jokeValue);
+
+    verify(jokeRepository, times(1)).findAllCategories();
+    verify(jokeRepository, times(1)).getRandomPersonalizedJokeByCategories("Bob", "dev");
     verify(this.httpServletResponse).setStatus(404);
     verifyNoMoreInteractions(jokeRepository);
   }

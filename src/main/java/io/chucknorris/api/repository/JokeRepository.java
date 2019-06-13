@@ -66,29 +66,23 @@ public interface JokeRepository extends JpaRepository<Joke, String> {
   Joke getRandomJoke();
 
   @Query(
-      value = "SELECT "
-          + "j.categories, "
-          + "j.created_at, "
-          + "j.joke_id, "
-          + "j.updated_at, "
-          + "REGEXP_REPLACE("
-          + "REGEXP_REPLACE("
-          + "REGEXP_REPLACE(j.value, 'Chuck Norris', :substitute,'ig'), "
-          + "'Chuck' , :substitute, 'ig'), "
-          + "'Norris', :substitute, 'ig') as value "
-          + "FROM joke AS j "
-          + "WHERE "
-          + "(j.value LIKE('%Chuck Norris %') OR j.value LIKE('%Chuck %')) "
-          + "AND "
-          + "j.value NOT ILIKE ('% he %') "
-          + "AND "
-          + "j.value NOT ILIKE ('% him %') "
-          + "AND "
-          + "j.value NOT ILIKE ('% his %') "
-          + "ORDER BY RANDOM() LIMIT 1;",
+      value = "SELECT j.categories, j.created_at, j.joke_id, j.updated_at, j.value "
+          + "FROM get_random_personalized_joke(:substitute, null) AS j;",
       nativeQuery = true
   )
-  Joke getRandomPersonalizedJoke(@Param("substitute") final String substitute);
+  Joke getRandomPersonalizedJoke(
+      @Param("substitute") final String substitute
+  );
+
+  @Query(
+      value = "SELECT j.categories, j.created_at, j.joke_id, j.updated_at, j.value "
+          + "FROM get_random_personalized_joke(:substitute, :categories) AS j;",
+      nativeQuery = true
+  )
+  Joke getRandomPersonalizedJokeByCategories(
+      @Param("substitute") final String substitute,
+      @Param("categories") final String categories
+  );
 
   @Query(
       value = "SELECT j.categories, j.created_at, j.joke_id, j.updated_at, j.value "

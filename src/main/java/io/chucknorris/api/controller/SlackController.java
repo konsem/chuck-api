@@ -174,6 +174,15 @@ public class SlackController {
       String substitute = request.getText().substring(1).trim();
       Joke joke = jokeRepository.getRandomPersonalizedJoke(substitute);
 
+      if(joke == null) {
+        Response response = new Response();
+        response.setText("Your search for *\"" + substitute
+            + "\"* did not match any joke ¯\\_(ツ)_/¯. Make sure that all words are spelled "
+            + "correctly. Try different keywords. Try more general keywords."
+        );
+        response.setResponseType(ResponseType.EPHEMERAL);
+      }
+
       return composeJokeResponse(joke, urlQueryParams);
     }
 
