@@ -25,7 +25,3 @@ jobs:
         - sleep 20
         - newman run postman/io.chucknorris.api.postman_collection.json --environment postman/local.postman_environment.json
       name: "End-to-End Tests"
-
-branches:
-  only:
-    - feature/end-to-end-testing
