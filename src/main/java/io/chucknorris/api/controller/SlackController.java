@@ -13,6 +13,7 @@ import io.chucknorris.api.lib.slack.impl.SlackConnectEvent;
 import io.chucknorris.api.lib.slack.impl.SlackService;
 import io.chucknorris.api.model.Joke;
 import io.chucknorris.api.repository.JokeRepository;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -47,16 +48,21 @@ public class SlackController {
 
   private EventService eventService;
   private JokeRepository jokeRepository;
+  private MeterRegistry meterRegistry;
   private SlackService slackService;
 
   /**
    * Returns a new {@link SlackController} instance.
    */
   public SlackController(
-      EventService eventService, JokeRepository jokeRepository, SlackService slackService
+      EventService eventService,
+      JokeRepository jokeRepository,
+      MeterRegistry meterRegistry,
+      SlackService slackService
   ) {
     this.eventService = eventService;
     this.jokeRepository = jokeRepository;
+    this.meterRegistry = meterRegistry;
     this.slackService = slackService;
   }
 
@@ -82,6 +88,11 @@ public class SlackController {
 
       SlackConnectEvent slackConnectEvent = new SlackConnectEvent(accessToken);
       eventService.publishEvent(slackConnectEvent);
+
+      meterRegistry.counter(
+          "application_slack_connect",
+          "team_name", accessToken.getTeamName()
+      ).increment();
     } else {
       model.setStatus(HttpStatus.UNAUTHORIZED);
       model.addObject("page_title", "Oops, an error has occurred.");
@@ -117,6 +128,13 @@ public class SlackController {
       urlQueryParams.set("utm_campaign", "random+joke");
 
       Joke joke = jokeRepository.getRandomJoke();
+
+      meterRegistry.counter(
+          "application_slack_command",
+          "command_type", "random_joke",
+          "team_name", request.getTeamDomain()
+      ).increment();
+
       return composeJokeResponse(joke, urlQueryParams);
     }
 
@@ -137,6 +155,12 @@ public class SlackController {
       Response response = new Response();
       response.setText(stringBuilder.toString());
       response.setResponseType(ResponseType.EPHEMERAL);
+
+      meterRegistry.counter(
+          "application_slack_command",
+          "command_type", "find_all_categories",
+          "team_name", request.getTeamDomain()
+      ).increment();
 
       return response;
     }
@@ -159,6 +183,12 @@ public class SlackController {
       urlQueryParams.set("utm_term", request.getTeamDomain());
       urlQueryParams.set("utm_campaign", "joke+by+id");
 
+      meterRegistry.counter(
+          "application_slack_command",
+          "command_type", "find_joke_by_id",
+          "team_name", request.getTeamDomain()
+      ).increment();
+
       return composeJokeResponse(joke.get(), urlQueryParams);
     }
 
@@ -172,7 +202,7 @@ public class SlackController {
       String substitute = request.getText().substring(1).trim();
       Joke joke = jokeRepository.getRandomPersonalizedJoke(substitute);
 
-      if(joke == null) {
+      if (joke == null) {
         Response response = new Response();
         response.setText("Your search for *\"" + substitute
             + "\"* did not match any joke ¯\\_(ツ)_/¯. Make sure that all words are spelled "
@@ -180,6 +210,12 @@ public class SlackController {
         );
         response.setResponseType(ResponseType.EPHEMERAL);
       }
+
+      meterRegistry.counter(
+          "application_slack_command",
+          "command_type", "random_personalized_joke",
+          "team_name", request.getTeamDomain()
+      ).increment();
 
       return composeJokeResponse(joke, urlQueryParams);
     }
@@ -265,6 +301,12 @@ public class SlackController {
 
       response.setAttachments(responseAttachments);
 
+      meterRegistry.counter(
+          "application_slack_command",
+          "command_type", "search_joke",
+          "team_name", request.getTeamDomain()
+      ).increment();
+
       return response;
     }
 
@@ -289,6 +331,13 @@ public class SlackController {
       urlQueryParams.set("utm_campaign", "random+joke+category");
 
       Joke joke = jokeRepository.getRandomJokeByCategory(request.getText());
+
+      meterRegistry.counter(
+          "application_slack_command",
+          "command_type", "random_joke_by_category",
+          "team_name", request.getTeamDomain()
+      ).increment();
+
       return composeJokeResponse(joke, urlQueryParams);
     }
 
