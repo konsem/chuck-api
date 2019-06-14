@@ -22,6 +22,6 @@ jobs:
       script: mvn test
     - script:
         - mvn spring-boot:run -Dspring.profiles.active=travis &
-        - sleep 20
+        - sleep 35
         - newman run postman/io.chucknorris.api.postman_collection.json --environment postman/local.postman_environment.json
       name: "End-to-End Tests"
