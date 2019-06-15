@@ -16,8 +16,7 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 3,
-  "iteration": 1560538542967,
+  "iteration": 1560583373512,
   "links": [],
   "panels": [
     {
@@ -61,7 +60,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(application_slack_command_total) by (command_type)",
+          "expr": "sum(application_slack_command_total{application=\"$application\", instance=\"$instance\"}) by (command_type)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{command_type}}",
@@ -152,7 +151,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(application_slack_command_total) by (team_name)",
+          "expr": "sum(application_slack_command_total{application=\"$application\", instance=\"$instance\"}) by (team_name)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{team_name}}",
@@ -211,8 +210,10 @@
       {
         "allValue": null,
         "current": {
-          "text": "host.docker.internal:8080",
-          "value": "host.docker.internal:8080"
+          "selected": false,
+          "tags": [],
+          "text": "api.chucknorris.io:80",
+          "value": "api.chucknorris.io:80"
         },
         "datasource": "Prometheus",
         "definition": "label_values(jvm_classes_loaded, instance)",
