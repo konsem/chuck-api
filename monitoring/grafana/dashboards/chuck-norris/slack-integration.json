@@ -16,8 +16,18 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "iteration": 1560583373512,
-  "links": [],
+  "iteration": 1560608636198,
+  "links": [
+    {
+      "icon": "external link",
+      "tags": [],
+      "targetBlank": true,
+      "title": "Slack App Directory",
+      "tooltip": "",
+      "type": "link",
+      "url": "https://slack.com/apps/A0S3YNZ2S-chuck-norris"
+    }
+  ],
   "panels": [
     {
       "aliasColors": {},
@@ -60,7 +70,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(application_slack_command_total{application=\"$application\", instance=\"$instance\"}) by (command_type)",
+          "expr": "sum(application_slack_command_total{application=~\"$application\", instance=~\"$instance\", team_name=~\"$team_name\"}) by (command_type)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{command_type}}",
@@ -151,7 +161,7 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(application_slack_command_total{application=\"$application\", instance=\"$instance\"}) by (team_name)",
+          "expr": "sum(application_slack_command_total{application=~\"$application\", instance=~\"$instance\", team_name=~\"$team_name\"}) by (team_name)",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{team_name}}",
@@ -203,24 +213,25 @@
   "schemaVersion": 18,
   "style": "dark",
   "tags": [
-    "slack"
+    "slack",
+    "chuck-norris"
   ],
   "templating": {
     "list": [
       {
-        "allValue": null,
+        "allValue": ".*",
         "current": {
-          "selected": false,
-          "tags": [],
-          "text": "api.chucknorris.io:80",
-          "value": "api.chucknorris.io:80"
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
         },
         "datasource": "Prometheus",
         "definition": "label_values(jvm_classes_loaded, instance)",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Instance",
-        "multi": false,
+        "multi": true,
         "name": "instance",
         "options": [],
         "query": "label_values(jvm_classes_loaded, instance)",
@@ -237,19 +248,45 @@
       {
         "allValue": null,
         "current": {
-          "isNone": true,
-          "text": "None",
-          "value": ""
+          "text": "All",
+          "value": "$__all"
         },
         "datasource": "Prometheus",
         "definition": "label_values(jvm_classes_loaded{instance=\"$instance\"}, application)",
         "hide": 0,
-        "includeAll": false,
+        "includeAll": true,
         "label": "Application",
-        "multi": false,
+        "multi": true,
         "name": "application",
         "options": [],
         "query": "label_values(jvm_classes_loaded{instance=\"$instance\"}, application)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "tagValuesQuery": "",
+        "tags": [],
+        "tagsQuery": "",
+        "type": "query",
+        "useTags": false
+      },
+      {
+        "allValue": "",
+        "current": {
+          "text": "All",
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": "Prometheus",
+        "definition": "label_values(application_slack_command_total, team_name)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Team",
+        "multi": true,
+        "name": "team_name",
+        "options": [],
+        "query": "label_values(application_slack_command_total, team_name)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -263,8 +300,8 @@
     ]
   },
   "time": {
-    "from": "now-6h",
-    "to": "now"
+    "from": "now/d",
+    "to": "now/d"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -293,6 +330,6 @@
   },
   "timezone": "",
   "title": "Slack Integration",
-  "uid": "w0zs5hnWz",
+  "uid": "t_u8o0nZk",
   "version": 1
 }

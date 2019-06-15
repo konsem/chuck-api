@@ -16,8 +16,7 @@
   "editable": true,
   "gnetId": 6756,
   "graphTooltip": 0,
-  "id": 3,
-  "iteration": 1560511972160,
+  "iteration": 1560608511590,
   "links": [],
   "panels": [
     {
@@ -98,7 +97,7 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "process_uptime_seconds{application=\"$application\", instance=\"$instance\"}",
+          "expr": "process_uptime_seconds{application=~\"$application\", instance=~\"$instance\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "",
@@ -3253,10 +3252,9 @@
       {
         "allValue": null,
         "current": {
-          "isNone": true,
           "tags": [],
-          "text": "None",
-          "value": ""
+          "text": "api.chucknorris.io:80",
+          "value": "api.chucknorris.io:80"
         },
         "datasource": "Prometheus",
         "definition": "",
@@ -3281,7 +3279,6 @@
         "allValue": null,
         "current": {
           "isNone": true,
-          "tags": [],
           "text": "None",
           "value": ""
         },
@@ -3307,9 +3304,8 @@
       {
         "allValue": null,
         "current": {
-          "isNone": true,
-          "text": "None",
-          "value": ""
+          "text": "HikariPool-1",
+          "value": "HikariPool-1"
         },
         "datasource": "Prometheus",
         "definition": "",
