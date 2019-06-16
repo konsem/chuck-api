@@ -65,16 +65,24 @@ For more examples check the [Swagger documentation](https://api.chucknorris.io/d
 
 ## Local development
 
-To start the stack using docker you need to set a couple of environment variables which are defined in an env file in the root directory of the project. All required variable identifiers are shipped in the [application-example.properties](./src/main/resources/application-example.properties) file which you can use as an example.
+An example of all required application variables can be found in the [application-example.properties](./src/main/resources/application-example.properties).
 
 ```sh
+# Start all application dependencies
 $ docker-compose up     # Will run as a long running process
 $ docker-compose up -d  # Will run in background
+
+# Start the application itself
+$ mvn install
+$ java -jar -Dspring.profiles.active=development target/api-0.0.1.jar
 ```
 
 **Urls:**
 
-- API: [http://localhost:8080](http://localhost:8080)
+- Application: [http://localhost:8080](http://localhost:8080)
+- Grafana: [http://localhost:3000](http://localhost:3000)
+- PostgreSQL: [http://localhost:5432](http://localhost:5432)
+- Prometheus: [http://localhost:9090](http://localhost:9090)
 - Swagger UI: [http://localhost:4567](http://localhost:4567)
 
 ## License
