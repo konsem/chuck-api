@@ -3,11 +3,12 @@ package io.chucknorris.api.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.chucknorris.api.lib.event.EventService;
 import io.chucknorris.api.lib.slack.SlackCommandResponse;
+import io.chucknorris.api.lib.slack.SlackCommandResponseAttachment;
 import io.chucknorris.api.lib.slack.impl.AccessToken;
 import io.chucknorris.api.lib.slack.impl.CommandResponse;
+import io.chucknorris.api.lib.slack.impl.CommandResponseAttachment;
 import io.chucknorris.api.lib.slack.impl.Help;
 import io.chucknorris.api.lib.slack.impl.Request;
-import io.chucknorris.api.lib.slack.impl.ResponseAttachment;
 import io.chucknorris.api.lib.slack.impl.ResponseType;
 import io.chucknorris.api.lib.slack.impl.SlackConnectEvent;
 import io.chucknorris.api.lib.slack.impl.SlackService;
@@ -149,7 +150,7 @@ public class SlackController {
       stringBuilder.append(String.join("`, `", jokeRepository.findAllCategories()));
       stringBuilder.append(
           "`. Type `/chuck {category_name}` to retrieve a "
-          + "random joke from within the given category."
+              + "random joke from within the given category."
       );
 
       CommandResponse response = new CommandResponse();
@@ -222,7 +223,8 @@ public class SlackController {
 
     if (request.getText().startsWith("?")) {
       String query = "";
-      Matcher queryMatcher = Pattern.compile("/?\\s?([a-zA-Z0-9]+)").matcher(request.getText());
+      Matcher queryMatcher = Pattern.compile("/?\\s?([a-zA-Z0-9]+)")
+          .matcher(request.getText());
       if (queryMatcher.find()) {
         query = queryMatcher.group(0).trim();
       }
@@ -256,7 +258,9 @@ public class SlackController {
       urlQueryParams.set("utm_term", request.getTeamDomain());
       urlQueryParams.set("utm_campaign", "search+joke");
 
-      ResponseAttachment[] responseAttachments = new ResponseAttachment[jokes.getContent().size()];
+      SlackCommandResponseAttachment[] attachments = new CommandResponseAttachment[
+          jokes.getContent().size()
+          ];
       for (int i = 0; i < jokes.getContent().size(); i++) {
         Joke joke = jokes.getContent().get(i);
 
@@ -269,13 +273,13 @@ public class SlackController {
             .build()
             .encode();
 
-        ResponseAttachment responseAttachment = new ResponseAttachment();
-        responseAttachment.setFallback(joke.getValue());
-        responseAttachment.setText(joke.getValue());
-        responseAttachment.setTitle("(" + ((page * itemsPerPage + 1) + i) + ")");
-        responseAttachment.setTitleLink(uriComponents.toUriString());
+        SlackCommandResponseAttachment attachment = new CommandResponseAttachment();
+        attachment.setFallback(joke.getValue());
+        attachment.setText(joke.getValue());
+        attachment.setTitle("(" + ((page * itemsPerPage + 1) + i) + ")");
+        attachment.setTitleLink(uriComponents.toUriString());
 
-        responseAttachments[i] = responseAttachment;
+        attachments[i] = attachment;
       }
 
       CommandResponse response = new CommandResponse();
@@ -299,7 +303,7 @@ public class SlackController {
         );
       }
 
-      response.setAttachments(responseAttachments);
+      response.setAttachments(attachments);
 
       meterRegistry.counter(
           "application_slack_command",
@@ -314,10 +318,11 @@ public class SlackController {
       String[] categories = jokeRepository.findAllCategories();
       if (!Arrays.stream(categories).anyMatch(request.getText()::equals)) {
         CommandResponse response = new CommandResponse();
-        response.setText("Sorry dude ¯\\_(ツ)_/¯ , we've found no jokes for the given category (\""
-            + request.getText()
-            + "\"). Type `/chuck -cat` to see available categories or search by "
-            + "query `/chuck ? {search_term}`"
+        response.setText(
+            "Sorry dude ¯\\_(ツ)_/¯ , we've found no jokes for the given category (\""
+                + request.getText()
+                + "\"). Type `/chuck -cat` to see available categories or search by "
+                + "query `/chuck ? {search_term}`"
         );
         response.setResponseType(ResponseType.EPHEMERAL);
 
@@ -344,7 +349,8 @@ public class SlackController {
     return new CommandResponse();
   }
 
-  private CommandResponse composeJokeResponse(Joke joke, MultiValueMap<String, String> urlParams) {
+  private SlackCommandResponse composeJokeResponse(Joke joke,
+      MultiValueMap<String, String> urlParams) {
     UriComponents uriComponents = UriComponentsBuilder
         .newInstance()
         .scheme("https")
@@ -354,14 +360,16 @@ public class SlackController {
         .build()
         .encode();
 
-    ResponseAttachment responseAttachment = new ResponseAttachment();
-    responseAttachment.setFallback(joke.getValue());
-    responseAttachment.setText(joke.getValue());
-    responseAttachment.setTitle("[permalink]");
-    responseAttachment.setTitleLink(uriComponents.toUriString());
+    SlackCommandResponseAttachment attachment = new CommandResponseAttachment();
+    attachment.setFallback(joke.getValue());
+    attachment.setText(joke.getValue());
+    attachment.setTitle("[permalink]");
+    attachment.setTitleLink(uriComponents.toUriString());
 
     CommandResponse response = new CommandResponse();
-    response.setAttachments(new ResponseAttachment[]{responseAttachment});
+    response.setAttachments(
+        new SlackCommandResponseAttachment[]{attachment}
+    );
 
     return response;
   }

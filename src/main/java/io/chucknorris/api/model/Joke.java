@@ -75,7 +75,7 @@ public class Joke implements Serializable {
 
   @ApiModelProperty(
       example = "Chuck Norris doesn't have disk latency because "
-              + "the hard drive knows to hurry the hell up.",
+          + "the hard drive knows to hurry the hell up.",
       name = "value",
       notes = "The contents of an incredible funny joke.",
       required = true

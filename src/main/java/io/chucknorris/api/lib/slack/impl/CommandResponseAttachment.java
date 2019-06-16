@@ -1,9 +1,10 @@
 package io.chucknorris.api.lib.slack.impl;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.chucknorris.api.lib.slack.SlackCommandResponseAttachment;
 import java.io.Serializable;
 
-public class ResponseAttachment implements Serializable {
+public class CommandResponseAttachment implements Serializable, SlackCommandResponseAttachment {
 
   @JsonProperty("fallback")
   private String fallback;

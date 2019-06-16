@@ -25,8 +25,8 @@ public class DailyChuck {
   }
 
   /**
-   * Adds a DailyChuckIssue {@link DailyChuckIssue} to the DailyChuck instance
-   * and increases the issue number {@link DailyChuck#issueNumber} by one.
+   * Adds a DailyChuckIssue {@link DailyChuckIssue} to the DailyChuck instance and increases the
+   * issue number {@link DailyChuck#issueNumber} by one.
    */
   public void addIssue(DailyChuckIssue dailyChuckIssue) {
     DailyChuckIssue[] dailyChuckIssues = new DailyChuckIssue[issues.length + 1];

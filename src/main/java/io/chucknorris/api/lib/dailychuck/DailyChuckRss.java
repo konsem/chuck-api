@@ -35,7 +35,7 @@ public class DailyChuckRss extends AbstractRssFeedView {
     feed.setTitle("The Daily Chuck");
     feed.setDescription(
         "Get your daily dose of the best #ChuckNorrisFacts "
-        + "every morning straight into your inbox."
+            + "every morning straight into your inbox."
     );
     feed.setLink("https://" + baseUrl + "/feed/daily-chuck.xml");
   }
@@ -44,7 +44,8 @@ public class DailyChuckRss extends AbstractRssFeedView {
   protected List<Item> buildFeedItems(Map<String, Object> model, HttpServletRequest request,
       HttpServletResponse response) {
     DailyChuckIssue[] dailyChuckIssues = dailyChuck.getIssues();
-    Arrays.sort(dailyChuck.getIssues(), Comparator.comparing(DailyChuckIssue::getDate).reversed());
+    Arrays.sort(dailyChuck.getIssues(),
+        Comparator.comparing(DailyChuckIssue::getDate).reversed());
 
     DailyChuckIssue currentIssue = dailyChuckIssues[0];
     Joke joke = jokeRepository.findById(currentIssue.getJokeId()).orElseThrow(

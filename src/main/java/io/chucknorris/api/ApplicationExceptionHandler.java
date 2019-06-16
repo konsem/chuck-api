@@ -25,7 +25,8 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         StringBuilder stringBuilder = new StringBuilder();
         for (ConstraintViolation violation : exception.getConstraintViolations()) {
           stringBuilder.append(
-              violation.getPropertyPath().toString() + ": " + violation.getMessage() + '\n'
+              violation.getPropertyPath().toString() + ": " + violation.getMessage()
+                  + '\n'
           );
         }
 
@@ -39,7 +40,8 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
       default:
         LinkedHashMap<String, Object> constraintViolations = new LinkedHashMap<>();
         for (ConstraintViolation violation : exception.getConstraintViolations()) {
-          constraintViolations.put(violation.getPropertyPath().toString(), violation.getMessage());
+          constraintViolations
+              .put(violation.getPropertyPath().toString(), violation.getMessage());
         }
 
         LinkedHashMap<String, Object> body = new LinkedHashMap<>();

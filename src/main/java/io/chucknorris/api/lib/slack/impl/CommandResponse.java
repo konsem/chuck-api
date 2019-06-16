@@ -2,6 +2,7 @@ package io.chucknorris.api.lib.slack.impl;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.chucknorris.api.lib.slack.SlackCommandResponse;
+import io.chucknorris.api.lib.slack.SlackCommandResponseAttachment;
 import java.io.Serializable;
 
 public class CommandResponse implements SlackCommandResponse, Serializable {
@@ -13,7 +14,7 @@ public class CommandResponse implements SlackCommandResponse, Serializable {
   private String text;
 
   @JsonProperty("attachments")
-  private ResponseAttachment[] attachments;
+  private SlackCommandResponseAttachment[] attachments;
 
   @JsonProperty("response_type")
   private String responseType = ResponseType.IN_CHANNEL;
@@ -34,11 +35,11 @@ public class CommandResponse implements SlackCommandResponse, Serializable {
     this.text = text;
   }
 
-  public ResponseAttachment[] getAttachments() {
+  public SlackCommandResponseAttachment[] getAttachments() {
     return attachments;
   }
 
-  public void setAttachments(ResponseAttachment[] attachments) {
+  public void setAttachments(SlackCommandResponseAttachment[] attachments) {
     this.attachments = attachments;
   }
 

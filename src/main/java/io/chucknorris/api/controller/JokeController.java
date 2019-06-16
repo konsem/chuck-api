@@ -147,7 +147,8 @@ public class JokeController {
     if (categoryString == null && name != null) {
       Joke joke = jokeRepository.getRandomPersonalizedJoke(name);
       if (!(joke instanceof Joke)) {
-        throw new EntityNotFoundException("No personalized jokes for name \"" + name + "\" found.");
+        throw new EntityNotFoundException(
+            "No personalized jokes for name \"" + name + "\" found.");
       }
       return joke;
     }
@@ -156,7 +157,8 @@ public class JokeController {
     List<String> categories = Arrays.asList(categoryString.split(","));
     for (String category : categories) {
       if (!Arrays.asList(availableCategories).contains(category)) {
-        throw new EntityNotFoundException("No jokes for category \"" + category + "\" found.");
+        throw new EntityNotFoundException(
+            "No jokes for category \"" + category + "\" found.");
       }
     }
 
@@ -164,7 +166,8 @@ public class JokeController {
       Joke joke = jokeRepository.getRandomPersonalizedJokeByCategories(name, categoryString);
       if (!(joke instanceof Joke)) {
         throw new EntityNotFoundException(
-            "No personalized jokes for name \"" + name + "\" and category \"" + categoryString
+            "No personalized jokes for name \"" + name + "\" and category \""
+                + categoryString
                 + "\" found.");
       }
       return joke;

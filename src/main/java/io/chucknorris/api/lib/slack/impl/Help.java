@@ -6,7 +6,7 @@ import io.chucknorris.api.lib.slack.SlackCommandResponse;
 public class Help implements SlackCommandResponse {
 
   @JsonProperty("attachments")
-  private ResponseAttachment[] attachments;
+  private CommandResponseAttachment[] attachments;
 
   @JsonProperty("icon_url")
   private String iconUrl = "https://assets.chucknorris.host/img/avatar/chuck-norris.png";
@@ -21,43 +21,43 @@ public class Help implements SlackCommandResponse {
    * Instantiates a new Help {@link Help}.
    */
   public Help() {
-    ResponseAttachment newsletter = new ResponseAttachment();
+    CommandResponseAttachment newsletter = new CommandResponseAttachment();
     newsletter.setTitle("The Daily Chuck");
     newsletter.setText(
         ":facepunch: Sign up for *The Daily Chuck* and get your daily dose of the best #ChuckNorrisFacts every morning straight int your inbox! https://mailchi.mp/5a19a2898bf7/the-daily-chuck");
 
-    ResponseAttachment randomJoke = new ResponseAttachment();
+    CommandResponseAttachment randomJoke = new CommandResponseAttachment();
     randomJoke.setText("Type `/chuck` to get a random joke.");
     randomJoke.setTitle("Random joke");
 
-    ResponseAttachment search = new ResponseAttachment();
+    CommandResponseAttachment search = new CommandResponseAttachment();
     search.setText(
         "Type `/chuck ? {search_term}` to search within tens of thousands Chuck Norris jokes.");
     search.setTitle("Free text search");
 
-    ResponseAttachment randomJokePersonalized = new ResponseAttachment();
+    CommandResponseAttachment randomJokePersonalized = new CommandResponseAttachment();
     randomJokePersonalized
         .setText("Type `/chuck @ {user_name}` to get a random personalized joke.");
     randomJokePersonalized.setTitle("Random personalized joke");
 
-    ResponseAttachment randomJokeFromCategory = new ResponseAttachment();
+    CommandResponseAttachment randomJokeFromCategory = new CommandResponseAttachment();
     randomJokeFromCategory.setText(
         "Type `/chuck {category_name}` to get a random joke from within a given category.");
     randomJokeFromCategory.setTitle("Random joke from category");
 
-    ResponseAttachment categories = new ResponseAttachment();
+    CommandResponseAttachment categories = new CommandResponseAttachment();
     categories.setText("Type `/chuck -cat` to retrieve a list of all categories.");
     categories.setTitle("Categories");
 
-    ResponseAttachment jokeById = new ResponseAttachment();
+    CommandResponseAttachment jokeById = new CommandResponseAttachment();
     jokeById.setText("Type `/chuck : {joke_id}` to retrieve get a joke by a given `id`.");
     jokeById.setTitle("Get joke by id");
 
-    ResponseAttachment help = new ResponseAttachment();
+    CommandResponseAttachment help = new CommandResponseAttachment();
     help.setText("Type `/chuck help` to display a list of available commands.");
     help.setTitle("Help");
 
-    attachments = new ResponseAttachment[]{
+    attachments = new CommandResponseAttachment[]{
         newsletter,
         randomJoke,
         search,
@@ -70,7 +70,7 @@ public class Help implements SlackCommandResponse {
   }
 
   @Override
-  public ResponseAttachment[] getAttachments() {
+  public CommandResponseAttachment[] getAttachments() {
     return attachments;
   }
 

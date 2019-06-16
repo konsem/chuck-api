@@ -20,5 +20,4 @@ public class PrivacyController {
   ) String get() {
     return "privacy";
   }
-
 }

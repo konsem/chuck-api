@@ -2,8 +2,15 @@ package io.chucknorris.api.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.chucknorris.api.lib.event.EventService;
-import io.chucknorris.api.lib.slack.impl.*;
 import io.chucknorris.api.lib.slack.SlackCommandResponse;
+import io.chucknorris.api.lib.slack.SlackCommandResponseAttachment;
+import io.chucknorris.api.lib.slack.impl.AccessToken;
+import io.chucknorris.api.lib.slack.impl.CommandResponse;
+import io.chucknorris.api.lib.slack.impl.CommandResponseAttachment;
+import io.chucknorris.api.lib.slack.impl.Request;
+import io.chucknorris.api.lib.slack.impl.ResponseType;
+import io.chucknorris.api.lib.slack.impl.SlackConnectEvent;
+import io.chucknorris.api.lib.slack.impl.SlackService;
 import io.chucknorris.api.model.Joke;
 import io.chucknorris.api.repository.JokeRepository;
 import io.micrometer.core.instrument.Counter;
@@ -132,56 +139,56 @@ public class SlackControllerTest {
         assertEquals("*Available commands:*", response.getText());
         assertEquals(ResponseType.EPHEMERAL, response.getResponseType());
 
-        ResponseAttachment newsletter = response.getAttachments()[0];
+        SlackCommandResponseAttachment newsletter = response.getAttachments()[0];
         assertEquals(null, newsletter.getFallback());
         assertEquals(":facepunch: Sign up for *The Daily Chuck* and get your daily dose of the best #ChuckNorrisFacts every morning straight int your inbox! https://mailchi.mp/5a19a2898bf7/the-daily-chuck", newsletter.getText());
         assertEquals("The Daily Chuck", newsletter.getTitle());
         assertEquals(null, newsletter.getTitleLink());
         assertEquals(new String[]{"text"}, newsletter.getMrkdownIn());
 
-        ResponseAttachment randomJoke = response.getAttachments()[1];
+        SlackCommandResponseAttachment randomJoke = response.getAttachments()[1];
         assertEquals(null, randomJoke.getFallback());
         assertEquals("Type `/chuck` to get a random joke.", randomJoke.getText());
         assertEquals("Random joke", randomJoke.getTitle());
         assertEquals(null, randomJoke.getTitleLink());
         assertEquals(new String[]{"text"}, randomJoke.getMrkdownIn());
 
-        ResponseAttachment search = response.getAttachments()[2];
+        SlackCommandResponseAttachment search = response.getAttachments()[2];
         assertEquals(null, search.getFallback());
         assertEquals("Type `/chuck ? {search_term}` to search within tens of thousands Chuck Norris jokes.", search.getText());
         assertEquals("Free text search", search.getTitle());
         assertEquals(null, search.getTitleLink());
         assertEquals(new String[]{"text"}, search.getMrkdownIn());
 
-        ResponseAttachment randomJokePersonalized = response.getAttachments()[3];
+        SlackCommandResponseAttachment randomJokePersonalized = response.getAttachments()[3];
         assertEquals(null, randomJokePersonalized.getFallback());
         assertEquals("Type `/chuck @ {user_name}` to get a random personalized joke.", randomJokePersonalized.getText());
         assertEquals("Random personalized joke", randomJokePersonalized.getTitle());
         assertEquals(null, randomJokePersonalized.getTitleLink());
         assertEquals(new String[]{"text"}, randomJokePersonalized.getMrkdownIn());
 
-        ResponseAttachment randomJokeFromCategory = response.getAttachments()[4];
+        SlackCommandResponseAttachment randomJokeFromCategory = response.getAttachments()[4];
         assertEquals(null, randomJokeFromCategory.getFallback());
         assertEquals("Type `/chuck {category_name}` to get a random joke from within a given category.", randomJokeFromCategory.getText());
         assertEquals("Random joke from category", randomJokeFromCategory.getTitle());
         assertEquals(null, randomJokeFromCategory.getTitleLink());
         assertEquals(new String[]{"text"}, randomJokeFromCategory.getMrkdownIn());
 
-        ResponseAttachment categories = response.getAttachments()[5];
+        SlackCommandResponseAttachment categories = response.getAttachments()[5];
         assertEquals(null, categories.getFallback());
         assertEquals("Type `/chuck -cat` to retrieve a list of all categories.", categories.getText());
         assertEquals("Categories", categories.getTitle());
         assertEquals(null, categories.getTitleLink());
         assertEquals(new String[]{"text"}, categories.getMrkdownIn());
 
-        ResponseAttachment help = response.getAttachments()[6];
+        SlackCommandResponseAttachment help = response.getAttachments()[6];
         assertEquals(null, help.getFallback());
         assertEquals("Type `/chuck : {joke_id}` to retrieve get a joke by a given `id`.", help.getText());
         assertEquals("Get joke by id", help.getTitle());
         assertEquals(null, help.getTitleLink());
         assertEquals(new String[]{"text"}, help.getMrkdownIn());
 
-        ResponseAttachment jokeById = response.getAttachments()[7];
+        SlackCommandResponseAttachment jokeById = response.getAttachments()[7];
         assertEquals(null, jokeById.getFallback());
         assertEquals("Type `/chuck help` to display a list of available commands.", jokeById.getText());
         assertEquals("Help", jokeById.getTitle());
@@ -204,11 +211,12 @@ public class SlackControllerTest {
         assertEquals(null, response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
 
-        ResponseAttachment responseAttachment = response.getAttachments()[0];
-        assertEquals(jokeValue, responseAttachment.getFallback());
-        assertEquals(jokeValue, responseAttachment.getText());
-        assertEquals("[permalink]", responseAttachment.getTitle());
-        assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+joke", responseAttachment.getTitleLink());
+        SlackCommandResponseAttachment commandResponseAttachment = response.getAttachments()[0];
+        assertEquals(jokeValue, commandResponseAttachment.getFallback());
+        assertEquals(jokeValue, commandResponseAttachment.getText());
+        assertEquals("[permalink]", commandResponseAttachment.getTitle());
+        assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+joke", commandResponseAttachment
+            .getTitleLink());
 
         verify(jokeRepository, times(1)).getRandomJoke();
         verifyNoMoreInteractions(jokeRepository);
@@ -234,11 +242,12 @@ public class SlackControllerTest {
         assertEquals(null, response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
 
-        ResponseAttachment responseAttachment = response.getAttachments()[0];
-        assertEquals(jokeValue, responseAttachment.getFallback());
-        assertEquals(jokeValue, responseAttachment.getText());
-        assertEquals("[permalink]", responseAttachment.getTitle());
-        assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+joke", responseAttachment.getTitleLink());
+        SlackCommandResponseAttachment commandResponseAttachment = response.getAttachments()[0];
+        assertEquals(jokeValue, commandResponseAttachment.getFallback());
+        assertEquals(jokeValue, commandResponseAttachment.getText());
+        assertEquals("[permalink]", commandResponseAttachment.getTitle());
+        assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+joke", commandResponseAttachment
+            .getTitleLink());
 
         verify(jokeRepository, times(1)).getRandomJoke();
         verifyNoMoreInteractions(jokeRepository);
@@ -266,11 +275,12 @@ public class SlackControllerTest {
         assertEquals(null, response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
 
-        ResponseAttachment responseAttachment = response.getAttachments()[0];
-        assertEquals(jokeValue, responseAttachment.getFallback());
-        assertEquals(jokeValue, responseAttachment.getText());
-        assertEquals("[permalink]", responseAttachment.getTitle());
-        assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+joke+category", responseAttachment.getTitleLink());
+        SlackCommandResponseAttachment commandResponseAttachment = response.getAttachments()[0];
+        assertEquals(jokeValue, commandResponseAttachment.getFallback());
+        assertEquals(jokeValue, commandResponseAttachment.getText());
+        assertEquals("[permalink]", commandResponseAttachment.getTitle());
+        assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+joke+category", commandResponseAttachment
+            .getTitleLink());
 
         verify(jokeRepository, times(1)).findAllCategories();
         verify(jokeRepository, times(1)).getRandomJokeByCategory("dev");
@@ -338,11 +348,12 @@ public class SlackControllerTest {
         assertEquals(null, response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
 
-        ResponseAttachment responseAttachment = response.getAttachments()[0];
-        assertEquals(jokeValue, responseAttachment.getFallback());
-        assertEquals(jokeValue, responseAttachment.getText());
-        assertEquals("[permalink]", responseAttachment.getTitle());
-        assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=joke+by+id", responseAttachment.getTitleLink());
+        SlackCommandResponseAttachment commandResponseAttachment = response.getAttachments()[0];
+        assertEquals(jokeValue, commandResponseAttachment.getFallback());
+        assertEquals(jokeValue, commandResponseAttachment.getText());
+        assertEquals("[permalink]", commandResponseAttachment.getTitle());
+        assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=joke+by+id", commandResponseAttachment
+            .getTitleLink());
 
         verify(jokeRepository, times(1)).findById(jokeId);
         verifyNoMoreInteractions(jokeRepository);
@@ -387,11 +398,12 @@ public class SlackControllerTest {
         assertEquals(null, response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
 
-        ResponseAttachment responseAttachment = response.getAttachments()[0];
-        assertEquals("Bob programs do not accept input.", responseAttachment.getFallback());
-        assertEquals("Bob programs do not accept input.", responseAttachment.getText());
-        assertEquals("[permalink]", responseAttachment.getTitle());
-        assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+personalized+joke", responseAttachment.getTitleLink());
+        SlackCommandResponseAttachment commandResponseAttachment = response.getAttachments()[0];
+        assertEquals("Bob programs do not accept input.", commandResponseAttachment.getFallback());
+        assertEquals("Bob programs do not accept input.", commandResponseAttachment.getText());
+        assertEquals("[permalink]", commandResponseAttachment.getTitle());
+        assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+personalized+joke", commandResponseAttachment
+            .getTitleLink());
 
         verify(jokeRepository, times(1)).getRandomPersonalizedJoke("Bob");
         verifyNoMoreInteractions(jokeRepository);
@@ -422,11 +434,12 @@ public class SlackControllerTest {
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
 
         for (int i = 0; i < response.getAttachments().length; i++) {
-            ResponseAttachment responseAttachment = response.getAttachments()[i];
-            assertEquals(jokeValue, responseAttachment.getFallback());
-            assertEquals(jokeValue, responseAttachment.getText());
-            assertEquals("(" + (i + 1) + ")", responseAttachment.getTitle());
-            assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=search+joke", responseAttachment.getTitleLink());
+            SlackCommandResponseAttachment commandResponseAttachment = response.getAttachments()[i];
+            assertEquals(jokeValue, commandResponseAttachment.getFallback());
+            assertEquals(jokeValue, commandResponseAttachment.getText());
+            assertEquals("(" + (i + 1) + ")", commandResponseAttachment.getTitle());
+            assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=search+joke", commandResponseAttachment
+                .getTitleLink());
         }
 
         verify(jokeRepository, times(1)).findByValueContains("program", pageable);
@@ -461,11 +474,12 @@ public class SlackControllerTest {
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
 
         for (int i = 0; i < response.getAttachments().length; i++) {
-            ResponseAttachment responseAttachment = response.getAttachments()[i];
-            assertEquals(jokeValue, responseAttachment.getFallback());
-            assertEquals(jokeValue, responseAttachment.getText());
-            assertEquals("(" + (i + 1) + ")", responseAttachment.getTitle());
-            assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=search+joke", responseAttachment.getTitleLink());
+            SlackCommandResponseAttachment commandResponseAttachment = response.getAttachments()[i];
+            assertEquals(jokeValue, commandResponseAttachment.getFallback());
+            assertEquals(jokeValue, commandResponseAttachment.getText());
+            assertEquals("(" + (i + 1) + ")", commandResponseAttachment.getTitle());
+            assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=search+joke", commandResponseAttachment
+                .getTitleLink());
         }
 
         verify(jokeRepository, times(1)).findByValueContains("program", pageable);
@@ -500,11 +514,12 @@ public class SlackControllerTest {
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
 
         for (int i = 0; i < response.getAttachments().length; i++) {
-            ResponseAttachment responseAttachment = response.getAttachments()[i];
-            assertEquals(jokeValue, responseAttachment.getFallback());
-            assertEquals(jokeValue, responseAttachment.getText());
-            assertEquals("(" + (i + 1 + 5) + ")", responseAttachment.getTitle());
-            assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=search+joke", responseAttachment.getTitleLink());
+            SlackCommandResponseAttachment commandResponseAttachment = response.getAttachments()[i];
+            assertEquals(jokeValue, commandResponseAttachment.getFallback());
+            assertEquals(jokeValue, commandResponseAttachment.getText());
+            assertEquals("(" + (i + 1 + 5) + ")", commandResponseAttachment.getTitle());
+            assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=search+joke", commandResponseAttachment
+                .getTitleLink());
         }
 
         verify(jokeRepository, times(1)).findByValueContains("program", pageable);

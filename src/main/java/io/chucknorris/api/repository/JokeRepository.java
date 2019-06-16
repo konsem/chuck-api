@@ -94,8 +94,8 @@ public interface JokeRepository extends JpaRepository<Joke, String> {
   Joke getRandomJokeByCategory(@Param("category") final String category);
 
   /**
-   * Gets a random joke by a comma separated list of categories. Matches if any
-   * of the joke's categories equals one of the provided categories.
+   * Gets a random joke by a comma separated list of categories. Matches if any of the joke's
+   * categories equals one of the provided categories.
    */
   @Query(
       value = "SELECT j.categories, j.created_at, j.joke_id, j.updated_at, j.value "

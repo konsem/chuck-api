@@ -30,9 +30,8 @@ public class EventService {
   }
 
   /**
-   * Publishes an event {@link Event} to an AWS SNS topic
-   * specified in "application.event.sns_topic_arn" and
-   * returns the result {@link PublishResult}.
+   * Publishes an event {@link Event} to an AWS SNS topic specified in
+   * "application.event.sns_topic_arn" and returns the result {@link PublishResult}.
    *
    * @param event The event being published {@link Event}
    * @return publishResult
@@ -56,10 +55,10 @@ public class EventService {
 
     logger.info(
         "[event_published] "
-        +
-        "event_message_id: \"" + publishResult.getMessageId() + "\" "
-        +
-        "event_message: \"" + message + "\""
+            +
+            "event_message_id: \"" + publishResult.getMessageId() + "\" "
+            +
+            "event_message: \"" + message + "\""
     );
 
     return publishResult;
