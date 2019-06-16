@@ -373,7 +373,7 @@
 													"pm.test('Schema is valid', function() {",
 													"  const result = tv4.validate(",
 													"    pm.response.json(),",
-													"    pm.environment.get(\"schema\").definitions['SlackResponse']",
+													"    pm.environment.get(\"schema\").definitions['SlackCommandResponse']",
 													"  );",
 													"});",
 													""
@@ -491,7 +491,7 @@
 													"pm.test('Schema is valid', function() {",
 													"  const result = tv4.validate(",
 													"    pm.response.json(),",
-													"    pm.environment.get(\"schema\").definitions['SlackResponse']",
+													"    pm.environment.get(\"schema\").definitions['SlackCommandResponse']",
 													"  );",
 													"});"
 												],
@@ -598,7 +598,7 @@
 													"pm.test('Schema is valid', function() {",
 													"  const result = tv4.validate(",
 													"    pm.response.json(),",
-													"    pm.environment.get(\"schema\").definitions['SlackResponse']",
+													"    pm.environment.get(\"schema\").definitions['SlackCommandResponse']",
 													"  );",
 													"});"
 												],
@@ -705,7 +705,7 @@
 													"pm.test('Schema is valid', function() {",
 													"  const result = tv4.validate(",
 													"    pm.response.json(),",
-													"    pm.environment.get(\"schema\").definitions['SlackResponse']",
+													"    pm.environment.get(\"schema\").definitions['SlackCommandResponse']",
 													"  );",
 													"});",
 													""
@@ -813,7 +813,7 @@
 													"pm.test('Schema is valid', function() {",
 													"  const result = tv4.validate(",
 													"    pm.response.json(),",
-													"    pm.environment.get(\"schema\").definitions['SlackResponse']",
+													"    pm.environment.get(\"schema\").definitions['SlackCommandResponse']",
 													"  );",
 													"});",
 													""
@@ -921,7 +921,7 @@
 													"pm.test('Schema is valid', function() {",
 													"  const result = tv4.validate(",
 													"    pm.response.json(),",
-													"    pm.environment.get(\"schema\").definitions['SlackResponse']",
+													"    pm.environment.get(\"schema\").definitions['SlackCommandResponse']",
 													"  );",
 													"});",
 													""
@@ -1029,7 +1029,7 @@
 													"pm.test('Schema is valid', function() {",
 													"  const result = tv4.validate(",
 													"    pm.response.json(),",
-													"    pm.environment.get(\"schema\").definitions['SlackResponse']",
+													"    pm.environment.get(\"schema\").definitions['SlackCommandResponse']",
 													"  );",
 													"});",
 													""

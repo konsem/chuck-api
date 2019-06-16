@@ -3,7 +3,7 @@ package io.chucknorris.api.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.chucknorris.api.lib.event.EventService;
 import io.chucknorris.api.lib.slack.impl.*;
-import io.chucknorris.api.lib.slack.SlackResponse;
+import io.chucknorris.api.lib.slack.SlackCommandResponse;
 import io.chucknorris.api.model.Joke;
 import io.chucknorris.api.repository.JokeRepository;
 import io.micrometer.core.instrument.Counter;
@@ -127,7 +127,7 @@ public class SlackControllerTest {
         Request request = new Request();
         request.setText("help");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals("*Available commands:*", response.getText());
         assertEquals(ResponseType.EPHEMERAL, response.getResponseType());
@@ -199,7 +199,7 @@ public class SlackControllerTest {
 
         when(jokeRepository.getRandomJoke()).thenReturn(joke);
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals(null, response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
@@ -229,7 +229,7 @@ public class SlackControllerTest {
         Request request = new Request();
         request.setTeamDomain("ACME");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals(null, response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
@@ -261,7 +261,7 @@ public class SlackControllerTest {
         request.setText("dev");
         request.setTeamDomain("ACME");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals(null, response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
@@ -292,7 +292,7 @@ public class SlackControllerTest {
         Request request = new Request();
         request.setText("does-not-exist");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(null, response.getAttachments());
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals("Sorry dude ¯\\_(ツ)_/¯ , we've found no jokes for the given category (\"does-not-exist\"). Type `/chuck -cat` to see available categories or search by query `/chuck ? {search_term}`", response.getText());
@@ -310,7 +310,7 @@ public class SlackControllerTest {
         request.setText("-cat");
         request.setTeamDomain("ACME");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(null, response.getAttachments());
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals("Available categories are: `dev`, `fashion`, `food`. Type `/chuck {category_name}` to retrieve a random joke from within the given category.", response.getText());
@@ -333,7 +333,7 @@ public class SlackControllerTest {
         request.setText(": " + jokeId);
         request.setTeamDomain("ACME");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals(null, response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
@@ -363,7 +363,7 @@ public class SlackControllerTest {
         Request request = new Request();
         request.setText(": does-not-exist");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(null, response.getAttachments());
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals("Sorry dude ¯\\_(ツ)_/¯ , no joke with id (\"does-not-exist\") found.", response.getText());
@@ -382,7 +382,7 @@ public class SlackControllerTest {
         request.setText("@Bob");
         request.setTeamDomain("ACME");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals(null, response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
@@ -416,7 +416,7 @@ public class SlackControllerTest {
         request.setText("? program");
         request.setTeamDomain("ACME");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals("*Search results: 1 - 3 of 3*.", response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
@@ -455,7 +455,7 @@ public class SlackControllerTest {
         request.setText("? program");
         request.setTeamDomain("ACME");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals("*Search results: 1 - 5 of 6*. Type `/chuck ? program --page 2` to see more results.", response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
@@ -494,7 +494,7 @@ public class SlackControllerTest {
         request.setText("? program  --page 2");
         request.setTeamDomain("ACME");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals("*Search results: 6 - 10 of 15*. Type `/chuck ? program --page 3` to see more results.", response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
@@ -529,7 +529,7 @@ public class SlackControllerTest {
         Request request = new Request();
         request.setText("? poop");
 
-        SlackResponse response = slackController.command(request);
+        SlackCommandResponse response = slackController.command(request);
         assertEquals(null, response.getAttachments());
         assertEquals(iconUrl, response.getIconUrl());
 

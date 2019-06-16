@@ -1,10 +1,10 @@
 package io.chucknorris.api.lib.slack.impl;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.chucknorris.api.lib.slack.SlackResponse;
+import io.chucknorris.api.lib.slack.SlackCommandResponse;
 import java.io.Serializable;
 
-public class Response implements SlackResponse, Serializable {
+public class CommandResponse implements SlackCommandResponse, Serializable {
 
   @JsonProperty("icon_url")
   private String iconUrl = "https://assets.chucknorris.host/img/avatar/chuck-norris.png";

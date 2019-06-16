@@ -1,9 +1,9 @@
 package io.chucknorris.api.lib.slack.impl;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.chucknorris.api.lib.slack.SlackResponse;
+import io.chucknorris.api.lib.slack.SlackCommandResponse;
 
-public class Help implements SlackResponse {
+public class Help implements SlackCommandResponse {
 
   @JsonProperty("attachments")
   private ResponseAttachment[] attachments;

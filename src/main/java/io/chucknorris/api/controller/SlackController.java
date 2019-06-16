@@ -2,11 +2,11 @@ package io.chucknorris.api.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.chucknorris.api.lib.event.EventService;
-import io.chucknorris.api.lib.slack.SlackResponse;
+import io.chucknorris.api.lib.slack.SlackCommandResponse;
 import io.chucknorris.api.lib.slack.impl.AccessToken;
+import io.chucknorris.api.lib.slack.impl.CommandResponse;
 import io.chucknorris.api.lib.slack.impl.Help;
 import io.chucknorris.api.lib.slack.impl.Request;
-import io.chucknorris.api.lib.slack.impl.Response;
 import io.chucknorris.api.lib.slack.impl.ResponseAttachment;
 import io.chucknorris.api.lib.slack.impl.ResponseType;
 import io.chucknorris.api.lib.slack.impl.SlackConnectEvent;
@@ -104,10 +104,10 @@ public class SlackController {
   }
 
   /**
-   * Returns a {@link SlackResponse}.
+   * Returns a {@link SlackCommandResponse}.
    *
    * @param request The slack request {@link Request}
-   * @return slackResponse
+   * @return slackCommandResponse
    */
   public @ResponseBody @RequestMapping(
       value = {"/integration/slack", "/jokes/slack"},
@@ -117,7 +117,7 @@ public class SlackController {
           HttpHeaders.CONTENT_TYPE + "=" + MediaType.APPLICATION_FORM_URLENCODED_VALUE
       },
       produces = MediaType.APPLICATION_JSON_VALUE
-  ) SlackResponse command(Request request) {
+  ) SlackCommandResponse command(Request request) {
     logger.info(request.toString());
 
     if (request.getText() == null || request.getText().isEmpty()) {
@@ -152,7 +152,7 @@ public class SlackController {
           + "random joke from within the given category."
       );
 
-      Response response = new Response();
+      CommandResponse response = new CommandResponse();
       response.setText(stringBuilder.toString());
       response.setResponseType(ResponseType.EPHEMERAL);
 
@@ -170,7 +170,7 @@ public class SlackController {
       Optional<Joke> joke = jokeRepository.findById(id);
 
       if (!joke.isPresent()) {
-        Response response = new Response();
+        CommandResponse response = new CommandResponse();
         response.setText("Sorry dude ¯\\_(ツ)_/¯ , no joke with id (\"" + id + "\") found.");
         response.setResponseType(ResponseType.EPHEMERAL);
 
@@ -203,7 +203,7 @@ public class SlackController {
       Joke joke = jokeRepository.getRandomPersonalizedJoke(substitute);
 
       if (joke == null) {
-        Response response = new Response();
+        CommandResponse response = new CommandResponse();
         response.setText("Your search for *\"" + substitute
             + "\"* did not match any joke ¯\\_(ツ)_/¯. Make sure that all words are spelled "
             + "correctly. Try different keywords. Try more general keywords."
@@ -240,7 +240,7 @@ public class SlackController {
       Page<Joke> jokes = jokeRepository.findByValueContains(query, pageable);
 
       if (jokes.getContent().size() < 1) {
-        Response response = new Response();
+        CommandResponse response = new CommandResponse();
         response.setText("Your search for *\"" + query
             + "\"* did not match any joke ¯\\_(ツ)_/¯. Make sure that all words are spelled "
             + "correctly. Try different keywords. Try more general keywords."
@@ -278,7 +278,7 @@ public class SlackController {
         responseAttachments[i] = responseAttachment;
       }
 
-      Response response = new Response();
+      CommandResponse response = new CommandResponse();
       if (!jokes.isLast()) {
         response.setText("*Search results: "
             + (page * itemsPerPage + 1)
@@ -313,7 +313,7 @@ public class SlackController {
     if (!request.getText().isEmpty()) {
       String[] categories = jokeRepository.findAllCategories();
       if (!Arrays.stream(categories).anyMatch(request.getText()::equals)) {
-        Response response = new Response();
+        CommandResponse response = new CommandResponse();
         response.setText("Sorry dude ¯\\_(ツ)_/¯ , we've found no jokes for the given category (\""
             + request.getText()
             + "\"). Type `/chuck -cat` to see available categories or search by "
@@ -341,10 +341,10 @@ public class SlackController {
       return composeJokeResponse(joke, urlQueryParams);
     }
 
-    return new Response();
+    return new CommandResponse();
   }
 
-  private Response composeJokeResponse(Joke joke, MultiValueMap<String, String> urlParams) {
+  private CommandResponse composeJokeResponse(Joke joke, MultiValueMap<String, String> urlParams) {
     UriComponents uriComponents = UriComponentsBuilder
         .newInstance()
         .scheme("https")
@@ -360,7 +360,7 @@ public class SlackController {
     responseAttachment.setTitle("[permalink]");
     responseAttachment.setTitleLink(uriComponents.toUriString());
 
-    Response response = new Response();
+    CommandResponse response = new CommandResponse();
     response.setAttachments(new ResponseAttachment[]{responseAttachment});
 
     return response;

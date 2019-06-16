@@ -2,7 +2,7 @@ package io.chucknorris.api.lib.slack;
 
 import io.chucknorris.api.lib.slack.impl.ResponseAttachment;
 
-public interface SlackResponse {
+public interface SlackCommandResponse {
 
   ResponseAttachment[] getAttachments();
 
