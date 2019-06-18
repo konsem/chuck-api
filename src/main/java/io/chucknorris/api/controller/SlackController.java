@@ -80,7 +80,7 @@ public class SlackController {
       headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_HTML_VALUE,
       produces = MediaType.TEXT_HTML_VALUE
   ) ModelAndView connect(
-      @RequestParam(value = "code") final String code
+      @RequestParam(value = "code", required = false) final String code
   ) throws JsonProcessingException {
     AccessToken accessToken = slackService.requestAccessToken(code);
 
