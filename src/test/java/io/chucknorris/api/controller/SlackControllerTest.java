@@ -179,56 +179,56 @@ public class SlackControllerTest {
         assertEquals(":facepunch: Sign up for *The Daily Chuck* and get your daily dose of the best #ChuckNorrisFacts every morning straight int your inbox! https://mailchi.mp/5a19a2898bf7/the-daily-chuck", newsletter.getText());
         assertEquals("The Daily Chuck", newsletter.getTitle());
         assertEquals(null, newsletter.getTitleLink());
-        assertEquals(new String[]{"text"}, newsletter.getMrkdownIn());
+        assertArrayEquals(new String[]{"text"}, newsletter.getMrkdownIn());
 
         SlackCommandResponseAttachment randomJoke = response.getAttachments()[1];
         assertEquals(null, randomJoke.getFallback());
         assertEquals("Type `/chuck` to get a random joke.", randomJoke.getText());
         assertEquals("Random joke", randomJoke.getTitle());
         assertEquals(null, randomJoke.getTitleLink());
-        assertEquals(new String[]{"text"}, randomJoke.getMrkdownIn());
+        assertArrayEquals(new String[]{"text"}, randomJoke.getMrkdownIn());
 
         SlackCommandResponseAttachment search = response.getAttachments()[2];
         assertEquals(null, search.getFallback());
         assertEquals("Type `/chuck ? {search_term}` to search within tens of thousands Chuck Norris jokes.", search.getText());
         assertEquals("Free text search", search.getTitle());
         assertEquals(null, search.getTitleLink());
-        assertEquals(new String[]{"text"}, search.getMrkdownIn());
+        assertArrayEquals(new String[]{"text"}, search.getMrkdownIn());
 
         SlackCommandResponseAttachment randomJokePersonalized = response.getAttachments()[3];
         assertEquals(null, randomJokePersonalized.getFallback());
         assertEquals("Type `/chuck @ {user_name}` to get a random personalized joke.", randomJokePersonalized.getText());
         assertEquals("Random personalized joke", randomJokePersonalized.getTitle());
         assertEquals(null, randomJokePersonalized.getTitleLink());
-        assertEquals(new String[]{"text"}, randomJokePersonalized.getMrkdownIn());
+        assertArrayEquals(new String[]{"text"}, randomJokePersonalized.getMrkdownIn());
 
         SlackCommandResponseAttachment randomJokeFromCategory = response.getAttachments()[4];
         assertEquals(null, randomJokeFromCategory.getFallback());
         assertEquals("Type `/chuck {category_name}` to get a random joke from within a given category.", randomJokeFromCategory.getText());
         assertEquals("Random joke from category", randomJokeFromCategory.getTitle());
         assertEquals(null, randomJokeFromCategory.getTitleLink());
-        assertEquals(new String[]{"text"}, randomJokeFromCategory.getMrkdownIn());
+        assertArrayEquals(new String[]{"text"}, randomJokeFromCategory.getMrkdownIn());
 
         SlackCommandResponseAttachment categories = response.getAttachments()[5];
         assertEquals(null, categories.getFallback());
         assertEquals("Type `/chuck -cat` to retrieve a list of all categories.", categories.getText());
         assertEquals("Categories", categories.getTitle());
         assertEquals(null, categories.getTitleLink());
-        assertEquals(new String[]{"text"}, categories.getMrkdownIn());
+        assertArrayEquals(new String[]{"text"}, categories.getMrkdownIn());
 
         SlackCommandResponseAttachment help = response.getAttachments()[6];
         assertEquals(null, help.getFallback());
         assertEquals("Type `/chuck : {joke_id}` to retrieve get a joke by a given `id`.", help.getText());
         assertEquals("Get joke by id", help.getTitle());
         assertEquals(null, help.getTitleLink());
-        assertEquals(new String[]{"text"}, help.getMrkdownIn());
+        assertArrayEquals(new String[]{"text"}, help.getMrkdownIn());
 
         SlackCommandResponseAttachment jokeById = response.getAttachments()[7];
         assertEquals(null, jokeById.getFallback());
         assertEquals("Type `/chuck help` to display a list of available commands.", jokeById.getText());
         assertEquals("Help", jokeById.getTitle());
         assertEquals(null, jokeById.getTitleLink());
-        assertEquals(new String[]{"text"}, jokeById.getMrkdownIn());
+        assertArrayEquals(new String[]{"text"}, jokeById.getMrkdownIn());
 
         verifyNoMoreInteractions(jokeRepository);
     }
