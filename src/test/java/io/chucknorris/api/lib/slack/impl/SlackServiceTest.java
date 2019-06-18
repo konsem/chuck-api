@@ -13,7 +13,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -27,6 +30,7 @@ public class SlackServiceTest {
 
     @Before
     public void setUp() {
+        ReflectionTestUtils.setField(slackService, "whitelistedCategories", "career,celebrity,dev,fashion,food,money,movie,travel");
         ReflectionTestUtils.setField(slackService, "clientId", "slack.oauth.client_id");
         ReflectionTestUtils.setField(slackService, "clientSecret", "slack.oauth.client_secret");
         ReflectionTestUtils.setField(slackService, "redirectUrl", "slack.oauth.redirect_uri");
@@ -40,6 +44,59 @@ public class SlackServiceTest {
             "https://slack.com/oauth/authorize/?client_id=slack.oauth.client_id&redirect_uri=slack.oauth.redirect_uri&scope=bot%20commands",
             authorizeUri.toUriString()
         );
+    }
+
+    @Test
+    public void testFilterNonWhitelistedCategories() {
+        assertArrayEquals(
+            slackService.filterNonWhitelistedCategories(
+                new String[]{
+                    "career",
+                    "celebrity",
+                    "dev",
+                    "explicit",
+                    "fashion",
+                    "food",
+                    "money",
+                    "movie",
+                    "travel"
+                }
+            ),
+            new String[]{
+                "career",
+                "celebrity",
+                "dev",
+                "fashion",
+                "food",
+                "money",
+                "movie",
+                "travel"
+            }
+        );
+    }
+
+    @Test
+    public void testGetWhitelistedCategoriesReturnsArrayOfCategories() {
+        assertArrayEquals(
+            slackService.getWhitelistedCategories(),
+            new String[]{
+                "career",
+                "celebrity",
+                "dev",
+                "fashion",
+                "food",
+                "money",
+                "movie",
+                "travel"
+            }
+        );
+    }
+
+    @Test
+    public void testIfGivenCategoryIsWhitelisted() {
+        assertFalse(slackService.isWhitelistedCategory("explicit"));
+        assertFalse(slackService.isWhitelistedCategory("religion"));
+        assertTrue(slackService.isWhitelistedCategory("dev"));
     }
 
     @Test

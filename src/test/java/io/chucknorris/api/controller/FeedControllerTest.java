@@ -1,5 +1,12 @@
 package io.chucknorris.api.controller;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
 import io.chucknorris.api.lib.DateUtil;
 import io.chucknorris.api.lib.dailychuck.DailyChuck;
 import io.chucknorris.api.lib.dailychuck.DailyChuckIssue;
@@ -7,21 +14,17 @@ import io.chucknorris.api.lib.dailychuck.DailyChuckRss;
 import io.chucknorris.api.lib.dailychuck.DailyChuckService;
 import io.chucknorris.api.lib.event.EventService;
 import io.chucknorris.api.repository.JokeRepository;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FeedControllerTest {

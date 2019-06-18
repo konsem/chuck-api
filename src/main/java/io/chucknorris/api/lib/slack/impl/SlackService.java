@@ -1,5 +1,6 @@
 package io.chucknorris.api.lib.slack.impl;
 
+import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -29,6 +30,9 @@ public class SlackService {
   @Autowired
   private RestTemplate restTemplate;
 
+  @Value("${slack.content.whitelisted_categories}")
+  private String whitelistedCategories;
+
   /**
    * Composes the authorize uri.
    */
@@ -47,6 +51,33 @@ public class SlackService {
         .queryParams(urlQueryParams)
         .build()
         .encode();
+  }
+
+  /**
+   * Filters all non-whitelisted categories from array.
+   */
+  public String[] filterNonWhitelistedCategories(String[] categories) {
+    return Arrays.stream(categories).filter(
+        category -> isWhitelistedCategory(category)
+    ).toArray(String[]::new);
+  }
+
+  /**
+   * Returns an array of whitelisted categories.
+   */
+  public String[] getWhitelistedCategories() {
+    return whitelistedCategories != null
+        ? whitelistedCategories.split(",")
+        : new String[]{};
+  }
+
+  /**
+   * Checks if a given category is whitelisted.
+   */
+  public Boolean isWhitelistedCategory(String category) {
+    return Arrays.stream(
+        getWhitelistedCategories()
+    ).anyMatch(category::equals);
   }
 
   /**

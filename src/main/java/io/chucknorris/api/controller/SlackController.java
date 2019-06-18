@@ -2,6 +2,7 @@ package io.chucknorris.api.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.chucknorris.api.lib.event.EventService;
+import io.chucknorris.api.lib.service.JokeService;
 import io.chucknorris.api.lib.slack.SlackCommandResponse;
 import io.chucknorris.api.lib.slack.SlackCommandResponseAttachment;
 import io.chucknorris.api.lib.slack.impl.AccessToken;
@@ -49,6 +50,7 @@ public class SlackController {
 
   private EventService eventService;
   private JokeRepository jokeRepository;
+  private JokeService jokeService;
   private MeterRegistry meterRegistry;
   private SlackService slackService;
 
@@ -58,11 +60,13 @@ public class SlackController {
   public SlackController(
       EventService eventService,
       JokeRepository jokeRepository,
+      JokeService jokeService,
       MeterRegistry meterRegistry,
       SlackService slackService
   ) {
     this.eventService = eventService;
     this.jokeRepository = jokeRepository;
+    this.jokeService = jokeService;
     this.meterRegistry = meterRegistry;
     this.slackService = slackService;
   }
@@ -75,8 +79,9 @@ public class SlackController {
       method = RequestMethod.GET,
       headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_HTML_VALUE,
       produces = MediaType.TEXT_HTML_VALUE
-  ) ModelAndView connect(@RequestParam(value = "code") final String code)
-      throws JsonProcessingException {
+  ) ModelAndView connect(
+      @RequestParam(value = "code") final String code
+  ) throws JsonProcessingException {
     AccessToken accessToken = slackService.requestAccessToken(code);
 
     ModelAndView model = new ModelAndView("connect/slack");
@@ -128,7 +133,9 @@ public class SlackController {
       urlQueryParams.set("utm_term", request.getTeamDomain());
       urlQueryParams.set("utm_campaign", "random+joke");
 
-      Joke joke = jokeRepository.getRandomJoke();
+      Joke joke = jokeService.randomJokeByCategories(
+          slackService.getWhitelistedCategories()
+      );
 
       meterRegistry.counter(
           "application_slack_command",
@@ -144,10 +151,12 @@ public class SlackController {
     }
 
     if (request.getText().equals("-cat")) {
-      StringBuilder stringBuilder = new StringBuilder();
+      String[] categories = jokeRepository.findAllCategories();
+      String[] whitelistedCategories = slackService.filterNonWhitelistedCategories(categories);
 
+      StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append("Available categories are: `");
-      stringBuilder.append(String.join("`, `", jokeRepository.findAllCategories()));
+      stringBuilder.append(String.join("`, `", whitelistedCategories));
       stringBuilder.append(
           "`. Type `/chuck {category_name}` to retrieve a "
               + "random joke from within the given category."
@@ -200,8 +209,14 @@ public class SlackController {
       urlQueryParams.set("utm_term", request.getTeamDomain());
       urlQueryParams.set("utm_campaign", "random+personalized+joke");
 
+      String[] categories = jokeRepository.findAllCategories();
+      String[] whitelistedCategories = slackService.filterNonWhitelistedCategories(categories);
+
       String substitute = request.getText().substring(1).trim();
-      Joke joke = jokeRepository.getRandomPersonalizedJoke(substitute);
+      Joke joke = jokeService.randomPersonalizedJokeByCategories(
+          substitute,
+          whitelistedCategories
+      );
 
       if (joke == null) {
         CommandResponse response = new CommandResponse();
@@ -210,6 +225,7 @@ public class SlackController {
             + "correctly. Try different keywords. Try more general keywords."
         );
         response.setResponseType(ResponseType.EPHEMERAL);
+        return response;
       }
 
       meterRegistry.counter(
@@ -315,8 +331,22 @@ public class SlackController {
     }
 
     if (!request.getText().isEmpty()) {
+      if (!slackService.isWhitelistedCategory(request.getText())) {
+        CommandResponse response = new CommandResponse();
+        response.setText(
+            "Sorry dude ¯\\_(ツ)_/¯ , the given category (\""
+                + request.getText()
+                + "\") is not whitelisted. Type `/chuck -cat` to see available categories "
+                + "or search by query `/chuck ? {search_term}`"
+        );
+        response.setResponseType(ResponseType.EPHEMERAL);
+
+        return response;
+      }
+
       String[] categories = jokeRepository.findAllCategories();
-      if (!Arrays.stream(categories).anyMatch(request.getText()::equals)) {
+      String[] whitelistedCategories = slackService.filterNonWhitelistedCategories(categories);
+      if (!Arrays.stream(whitelistedCategories).anyMatch(request.getText()::equals)) {
         CommandResponse response = new CommandResponse();
         response.setText(
             "Sorry dude ¯\\_(ツ)_/¯ , we've found no jokes for the given category (\""
@@ -335,7 +365,7 @@ public class SlackController {
       urlQueryParams.set("utm_term", request.getTeamDomain());
       urlQueryParams.set("utm_campaign", "random+joke+category");
 
-      Joke joke = jokeRepository.getRandomJokeByCategory(request.getText());
+      Joke joke = jokeService.randomJokeByCategory(request.getText());
 
       meterRegistry.counter(
           "application_slack_command",
@@ -349,8 +379,10 @@ public class SlackController {
     return new CommandResponse();
   }
 
-  private SlackCommandResponse composeJokeResponse(Joke joke,
-      MultiValueMap<String, String> urlParams) {
+  private SlackCommandResponse composeJokeResponse(
+      Joke joke,
+      MultiValueMap<String, String> urlParams
+  ) {
     UriComponents uriComponents = UriComponentsBuilder
         .newInstance()
         .scheme("https")
