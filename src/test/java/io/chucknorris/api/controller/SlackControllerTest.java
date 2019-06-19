@@ -36,6 +36,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.servlet.ModelAndView;
@@ -532,13 +533,23 @@ public class SlackControllerTest {
 
     @Test
     public void testReturnSearchResultWithLessThanFiveJokes() {
-        Pageable pageable = PageRequest.of(0, 5);
-        when(jokeRepository.findByValueContains("program", pageable)).thenReturn(
-                new PageImpl<>(Arrays.asList(joke, joke, joke))
+        String query = "Kleenex";
+        String[] categories = new String[]{"dev", "movie"};
+
+        Pageable pageable = PageRequest.of(
+            0,
+            5,
+            Sort.unsorted()
+        );
+
+        when(jokeRepository.findAllCategories()).thenReturn(categories);
+        when(slackService.filterNonWhitelistedCategories(categories)).thenReturn(categories);
+        when(jokeService.searchWithCategoryFilter(query, categories, pageable)).thenReturn(
+            new PageImpl<>(Arrays.asList(joke, joke, joke))
         );
 
         Request request = new Request();
-        request.setText("? program");
+        request.setText("? " + query);
         request.setTeamDomain("ACME");
 
         SlackCommandResponse response = slackController.command(request);
@@ -555,8 +566,18 @@ public class SlackControllerTest {
                 .getTitleLink());
         }
 
-        verify(jokeRepository, times(1)).findByValueContains("program", pageable);
+        verify(jokeRepository, times(1)).findAllCategories();
         verifyNoMoreInteractions(jokeRepository);
+
+        verify(slackService, times(1)).filterNonWhitelistedCategories(categories);
+        verifyNoMoreInteractions(slackService);
+
+        verify(jokeService, times(1)).searchWithCategoryFilter(
+            query,
+            categories,
+            pageable
+        );
+        verifyNoMoreInteractions(jokeService);
 
         verify(meterRegistry, times(1)).counter(
             "application_slack_command", "command_type", "search_joke", "team_name", "ACME"
@@ -569,21 +590,32 @@ public class SlackControllerTest {
 
     @Test
     public void testReturnSearchResultWithMoreThanFiveJokes() {
-        Pageable pageable = PageRequest.of(0, 5);
-        Page page = new PageImpl(
+        String query = "Kleenex";
+        String[] categories = new String[]{"dev", "movie"};
+
+        Pageable pageable = PageRequest.of(
+            0,
+            5,
+            Sort.unsorted()
+        );
+
+        when(jokeRepository.findAllCategories()).thenReturn(categories);
+        when(slackService.filterNonWhitelistedCategories(categories)).thenReturn(categories);
+        when(jokeService.searchWithCategoryFilter(query, categories, pageable)).thenReturn(
+            new PageImpl(
                 Arrays.asList(joke, joke, joke, joke, joke),
                 pageable,
                 6
+            )
         );
-        when(jokeRepository.findByValueContains("program", pageable)).thenReturn(page);
 
         Request request = new Request();
-        request.setText("? program");
+        request.setText("? " + query);
         request.setTeamDomain("ACME");
 
         SlackCommandResponse response = slackController.command(request);
         assertEquals(iconUrl, response.getIconUrl());
-        assertEquals("*Search results: 1 - 5 of 6*. Type `/chuck ? program --page 2` to see more results.", response.getText());
+        assertEquals("*Search results: 1 - 5 of 6*. Type `/chuck ? " + query + " --page 2` to see more results.", response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
 
         for (int i = 0; i < response.getAttachments().length; i++) {
@@ -595,8 +627,11 @@ public class SlackControllerTest {
                 .getTitleLink());
         }
 
-        verify(jokeRepository, times(1)).findByValueContains("program", pageable);
-        verifyNoMoreInteractions(jokeRepository);
+        verify(slackService, times(1)).filterNonWhitelistedCategories(categories);
+        verifyNoMoreInteractions(slackService);
+
+        verify(jokeService, times(1)).searchWithCategoryFilter(query, categories, pageable);
+        verifyNoMoreInteractions(jokeService);
 
         verify(meterRegistry, times(1)).counter(
             "application_slack_command", "command_type", "search_joke", "team_name", "ACME"
@@ -609,21 +644,27 @@ public class SlackControllerTest {
 
     @Test
     public void testReturnSearchResultWithMoreThanFiveJokesSecondPage() {
-        Pageable pageable = PageRequest.of(1, 5);
-        Page page = new PageImpl(
+        String query = "Kleenex";
+        String[] categories = new String[]{"dev", "movie"};
+        Pageable pageable = PageRequest.of(1, 5, Sort.unsorted());
+
+        when(jokeRepository.findAllCategories()).thenReturn(categories);
+        when(slackService.filterNonWhitelistedCategories(categories)).thenReturn(categories);
+        when(jokeService.searchWithCategoryFilter(query, categories, pageable)).thenReturn(
+            new PageImpl(
                 Arrays.asList(joke, joke, joke, joke, joke),
                 pageable,
                 15
+            )
         );
-        when(jokeRepository.findByValueContains("program", pageable)).thenReturn(page);
 
         Request request = new Request();
-        request.setText("? program  --page 2");
+        request.setText("? " + query + "  --page 2");
         request.setTeamDomain("ACME");
 
         SlackCommandResponse response = slackController.command(request);
         assertEquals(iconUrl, response.getIconUrl());
-        assertEquals("*Search results: 6 - 10 of 15*. Type `/chuck ? program --page 3` to see more results.", response.getText());
+        assertEquals("*Search results: 6 - 10 of 15*. Type `/chuck ? " + query + " --page 3` to see more results.", response.getText());
         assertEquals(ResponseType.IN_CHANNEL, response.getResponseType());
 
         for (int i = 0; i < response.getAttachments().length; i++) {
@@ -635,8 +676,14 @@ public class SlackControllerTest {
                 .getTitleLink());
         }
 
-        verify(jokeRepository, times(1)).findByValueContains("program", pageable);
+        verify(jokeRepository, times(1)).findAllCategories();
         verifyNoMoreInteractions(jokeRepository);
+
+        verify(slackService, times(1)).filterNonWhitelistedCategories(categories);
+        verifyNoMoreInteractions(slackService);
+
+        verify(jokeService, times(1)).searchWithCategoryFilter(query, categories, pageable);
+        verifyNoMoreInteractions(jokeService);
 
         verify(meterRegistry, times(1)).counter(
             "application_slack_command", "command_type", "search_joke", "team_name", "ACME"
@@ -649,22 +696,42 @@ public class SlackControllerTest {
 
     @Test
     public void testReturnErrorIfSearchResultIsEmpty() {
-        Pageable pageable = PageRequest.of(0, 5);
-        when(jokeRepository.findByValueContains("poop", pageable)).thenReturn(
-                new PageImpl<>(new ArrayList<>())
+        String query = "poop";
+        String[] categories = new String[]{"dev", "movie"};
+
+        Pageable pageable = PageRequest.of(
+            0,
+            5,
+            Sort.unsorted()
+        );
+
+        when(jokeRepository.findAllCategories()).thenReturn(categories);
+        when(slackService.filterNonWhitelistedCategories(categories)).thenReturn(categories);
+        when(jokeService.searchWithCategoryFilter(query, categories, pageable)).thenReturn(
+            new PageImpl<>(new ArrayList<>())
         );
 
         Request request = new Request();
-        request.setText("? poop");
+        request.setText("? " + query);
 
         SlackCommandResponse response = slackController.command(request);
         assertArrayEquals(null, response.getAttachments());
         assertEquals(iconUrl, response.getIconUrl());
 
-        assertEquals("Your search for *\"poop\"* did not match any joke ¯\\_(ツ)_/¯. Make sure that all words are spelled correctly. Try different keywords. Try more general keywords.", response.getText());
+        assertEquals("Your search for *\"" + query + "\"* did not match any joke ¯\\_(ツ)_/¯. Make sure that all words are spelled correctly. Try different keywords. Try more general keywords.", response.getText());
         assertEquals(ResponseType.EPHEMERAL, response.getResponseType());
 
-        verify(jokeRepository, times(1)).findByValueContains("poop", pageable);
+        verify(jokeRepository, times(1)).findAllCategories();
         verifyNoMoreInteractions(jokeRepository);
+
+        verify(slackService, times(1)).filterNonWhitelistedCategories(categories);
+        verifyNoMoreInteractions(slackService);
+
+        verify(jokeService, times(1)).searchWithCategoryFilter(
+            query,
+            categories,
+            pageable
+        );
+        verifyNoMoreInteractions(jokeService);
     }
 }

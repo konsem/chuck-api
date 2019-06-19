@@ -14,6 +14,9 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JokeServiceTest {
@@ -67,6 +70,26 @@ public class JokeServiceTest {
     verify(jokeRepository, times(1)).getRandomPersonalizedJokeByCategories(
         substitute,
         "dev, movie"
+    );
+    verifyNoMoreInteractions(jokeRepository);
+  }
+
+  @Test
+  public void testSearchWithCategoryFilter() {
+    String query = "Kleenex";
+    String[] categories = new String[]{"dev", "movie"};
+    Pageable pageable = PageRequest.of(1, 5);
+
+    when(
+        jokeRepository.findByValueContainsAndFilter(query, "dev, movie", pageable)
+    ).thenReturn(Page.empty());
+
+    jokeService.searchWithCategoryFilter(query, categories, pageable);
+
+    verify(jokeRepository, times(1)).findByValueContainsAndFilter(
+        query,
+        "dev, movie",
+        pageable
     );
     verifyNoMoreInteractions(jokeRepository);
   }

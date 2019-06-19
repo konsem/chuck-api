@@ -26,6 +26,19 @@ public interface JokeRepository extends JpaRepository<Joke, String> {
   Page<Joke> findByValueContains(@Param("query") final String query, Pageable pageable);
 
   @Query(
+      value = "SELECT j.categories, j.created_at, j.joke_id, j.updated_at, j.value "
+          + "FROM find_by_by_value_contains_and_filter(:query, :categories) AS j",
+      countQuery = "SELECT count(*) "
+          + "FROM find_by_by_value_contains_and_filter(:query, :categories)",
+      nativeQuery = true
+  )
+  Page<Joke> findByValueContainsAndFilter(
+      @Param("query") final String query,
+      @Param("categories") final String categories,
+      Pageable pageable
+  );
+
+  @Query(
       value = "SELECT j.categories->>0 FROM joke j WHERE j.categories IS NOT NULL "
           + "GROUP BY j.categories->>0 "
           + "ORDER BY j.categories->>0 ASC",

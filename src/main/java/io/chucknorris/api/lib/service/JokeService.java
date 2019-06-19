@@ -2,6 +2,9 @@ package io.chucknorris.api.lib.service;
 
 import io.chucknorris.api.model.Joke;
 import io.chucknorris.api.repository.JokeRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,6 +41,21 @@ public class JokeService {
     return jokeRepository.getRandomPersonalizedJokeByCategories(
         substitute,
         String.join(", ", categories)
+    );
+  }
+
+  /**
+   * Search jokes by query and with category filter.
+   */
+  public Page<Joke> searchWithCategoryFilter(
+      final String query,
+      final String[] categories,
+      final Pageable pageable
+  ) {
+    return jokeRepository.findByValueContainsAndFilter(
+        query,
+        String.join(", ", categories),
+        pageable
     );
   }
 }

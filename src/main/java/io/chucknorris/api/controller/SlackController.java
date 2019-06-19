@@ -239,8 +239,7 @@ public class SlackController {
 
     if (request.getText().startsWith("?")) {
       String query = "";
-      Matcher queryMatcher = Pattern.compile("/?\\s?([a-zA-Z0-9]+)")
-          .matcher(request.getText());
+      Matcher queryMatcher = Pattern.compile("/?\\s?([a-zA-Z0-9]+)").matcher(request.getText());
       if (queryMatcher.find()) {
         query = queryMatcher.group(0).trim();
       }
@@ -255,7 +254,14 @@ public class SlackController {
 
       int itemsPerPage = 5;
       Pageable pageable = PageRequest.of(page, itemsPerPage);
-      Page<Joke> jokes = jokeRepository.findByValueContains(query, pageable);
+
+      String[] categories = jokeRepository.findAllCategories();
+      String[] whitelistedCategories = slackService.filterNonWhitelistedCategories(categories);
+      Page<Joke> jokes = jokeService.searchWithCategoryFilter(
+          query,
+          whitelistedCategories,
+          pageable
+      );
 
       if (jokes.getContent().size() < 1) {
         CommandResponse response = new CommandResponse();
