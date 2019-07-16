@@ -2,27 +2,13 @@ package io.chucknorris.api.feed.dailychuck;
 
 import java.util.Calendar;
 import java.util.Date;
+import lombok.Data;
 
+@Data
 public class DailyChuck {
 
   private Long issueNumber;
   private DailyChuckIssue[] issues;
-
-  public Long getIssueNumber() {
-    return issueNumber;
-  }
-
-  public void setIssueNumber(Long issueNumber) {
-    this.issueNumber = issueNumber;
-  }
-
-  public DailyChuckIssue[] getIssues() {
-    return issues;
-  }
-
-  public void setIssues(DailyChuckIssue[] issues) {
-    this.issues = issues;
-  }
 
   /**
    * Adds a DailyChuckIssue {@link DailyChuckIssue} to the DailyChuck instance and increases the

@@ -37,10 +37,11 @@ public class JokeControllerTest {
   public void setUp() {
     jokeId = "ys--0t_-rrifz5jtcparbg";
     jokeValue = "Some people ask for a Kleenex when they sneeze, Chuck Norris asks for a body bag.";
-    joke = new Joke()
-        .setCategories(new String[]{"dev"})
-        .setId(jokeId)
-        .setValue(jokeValue);
+    joke = Joke.builder()
+        .categories(new String[]{"dev"})
+        .id(jokeId)
+        .value(jokeValue)
+        .build();
   }
 
   @Test
@@ -192,7 +193,9 @@ public class JokeControllerTest {
 
   @Test
   public void testGetRandomPersonalisedJokeReturnsJoke() {
-    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    joke = joke.toBuilder()
+        .value(joke.getValue().replace("Chuck Norris", "Bob"))
+        .build();
     when(jokeRepository.getRandomPersonalizedJoke("Bob")).thenReturn(joke);
 
     Joke joke = jokeController.getRandomJoke(null, "Bob");
@@ -204,7 +207,9 @@ public class JokeControllerTest {
 
   @Test
   public void testGetRandomPersonalisedJokeByCategoryReturnsJoke() {
-    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    joke = joke.toBuilder().value(
+        joke.getValue().replace("Chuck Norris", "Bob")
+    ).build();
     when(jokeRepository.findAllCategories()).thenReturn(new String[]{"dev"});
     when(jokeRepository.getRandomPersonalizedJokeByCategories(
         "Bob", "dev"
@@ -222,7 +227,9 @@ public class JokeControllerTest {
 
   @Test(expected = EntityNotFoundException.class)
   public void testGetRandomPersonalisedJokeByCategoryThrowsException() {
-    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    joke = joke.toBuilder().value(
+        joke.getValue().replace("Chuck Norris", "Bob")
+    ).build();
     when(jokeRepository.findAllCategories()).thenReturn(new String[]{"dev"});
     when(jokeRepository.getRandomPersonalizedJokeByCategories(
         "Bob", "dev"
@@ -233,7 +240,9 @@ public class JokeControllerTest {
 
   @Test(expected = EntityNotFoundException.class)
   public void testGetRandomPersonalisedJokeThrowsException() {
-    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    joke = joke.toBuilder().value(
+        joke.getValue().replace("Chuck Norris", "Bob")
+    ).build();
     when(jokeRepository.getRandomPersonalizedJoke("Bob")).thenReturn(null);
 
     jokeController.getRandomJoke(null, "Bob");
@@ -303,7 +312,9 @@ public class JokeControllerTest {
 
   @Test
   public void testGetRandomPersonalisedJokeValueReturnsJokeValue() {
-    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    joke = joke.toBuilder().value(
+        joke.getValue().replace("Chuck Norris", "Bob")
+    ).build();
     when(jokeRepository.getRandomPersonalizedJoke("Bob")).thenReturn(joke);
 
     String jokeValue = jokeController.getRandomJokeValue(
@@ -317,7 +328,9 @@ public class JokeControllerTest {
 
   @Test
   public void testGetRandomPersonalisedJokeValueEmptyStringIfNoJokeWasFound() {
-    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    joke = joke.toBuilder().value(
+        joke.getValue().replace("Chuck Norris", "Bob")
+    ).build();
     when(jokeRepository.getRandomPersonalizedJoke("Bob")).thenReturn(null);
 
     String jokeValue = jokeController.getRandomJokeValue(
@@ -332,7 +345,9 @@ public class JokeControllerTest {
 
   @Test
   public void testGetRandomPersonalisedJokeValueByCategoryReturnsJokeValue() {
-    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    joke = joke.toBuilder().value(
+        joke.getValue().replace("Chuck Norris", "Bob")
+    ).build();
     when(jokeRepository.findAllCategories()).thenReturn(new String[]{"dev"});
     when(jokeRepository.getRandomPersonalizedJokeByCategories("Bob", "dev")).thenReturn(joke);
 
@@ -348,7 +363,9 @@ public class JokeControllerTest {
 
   @Test
   public void testGetRandomPersonalisedJokeValueByCategoryEmptyStringIfNoJokeWasFound() {
-    joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+    joke = joke.toBuilder().value(
+        joke.getValue().replace("Chuck Norris", "Bob")
+    ).build();
     when(jokeRepository.findAllCategories()).thenReturn(new String[]{"dev"});
     when(jokeRepository.getRandomPersonalizedJokeByCategories("Bob", "dev")).thenReturn(null);
 

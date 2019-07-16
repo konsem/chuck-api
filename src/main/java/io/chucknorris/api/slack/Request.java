@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import java.io.Serializable;
+import lombok.Data;
 
+@Data
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class Request implements Serializable {
 
@@ -74,129 +76,5 @@ public class Request implements Serializable {
    */
   @JsonProperty("user_name")
   private String userName;
-
-  @Override
-  public String toString() {
-    final StringBuffer sb = new StringBuffer("Request{");
-    sb.append("channelId='").append(channelId).append('\'');
-    sb.append(", channelName='").append(channelName).append('\'');
-    sb.append(", command='").append(command).append('\'');
-    sb.append(", enterpriseId='").append(enterpriseId).append('\'');
-    sb.append(", enterpriseName='").append(enterpriseName).append('\'');
-    sb.append(", responseUrl='").append(responseUrl).append('\'');
-    sb.append(", teamDomain='").append(teamDomain).append('\'');
-    sb.append(", teamId='").append(teamId).append('\'');
-    sb.append(", text='").append(text).append('\'');
-    sb.append(", token='").append(token).append('\'');
-    sb.append(", triggerId='").append(triggerId).append('\'');
-    sb.append(", userId='").append(userId).append('\'');
-    sb.append(", userName='").append(userName).append('\'');
-    sb.append('}');
-    return sb.toString();
-  }
-
-  public String getChannelId() {
-    return channelId;
-  }
-
-  public void setChannelId(String channelId) {
-    this.channelId = channelId;
-  }
-
-  public String getChannelName() {
-    return channelName;
-  }
-
-  public void setChannelName(String channelName) {
-    this.channelName = channelName;
-  }
-
-  public String getCommand() {
-    return command;
-  }
-
-  public void setCommand(String command) {
-    this.command = command;
-  }
-
-  public String getEnterpriseId() {
-    return enterpriseId;
-  }
-
-  public void setEnterpriseId(String enterpriseId) {
-    this.enterpriseId = enterpriseId;
-  }
-
-  public String getEnterpriseName() {
-    return enterpriseName;
-  }
-
-  public void setEnterpriseName(String enterpriseName) {
-    this.enterpriseName = enterpriseName;
-  }
-
-  public String getResponseUrl() {
-    return responseUrl;
-  }
-
-  public void setResponseUrl(String responseUrl) {
-    this.responseUrl = responseUrl;
-  }
-
-  public String getTeamDomain() {
-    return teamDomain;
-  }
-
-  public void setTeamDomain(String teamDomain) {
-    this.teamDomain = teamDomain;
-  }
-
-  public String getTeamId() {
-    return teamId;
-  }
-
-  public void setTeamId(String teamId) {
-    this.teamId = teamId;
-  }
-
-  public String getText() {
-    return text;
-  }
-
-  public void setText(String text) {
-    this.text = text;
-  }
-
-  public String getToken() {
-    return token;
-  }
-
-  public void setToken(String token) {
-    this.token = token;
-  }
-
-  public String getTriggerId() {
-    return triggerId;
-  }
-
-  public void setTriggerId(String triggerId) {
-    this.triggerId = triggerId;
-  }
-
-  public String getUserId() {
-    return userId;
-  }
-
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
-
-  public String getUserName() {
-    return userName;
-  }
-
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
 }
 

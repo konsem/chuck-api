@@ -1,7 +1,9 @@
 package io.chucknorris.api.slack;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Value;
 
+@Value
 public class Help implements SlackCommandResponse {
 
   @JsonProperty("attachments")
@@ -66,25 +68,5 @@ public class Help implements SlackCommandResponse {
         jokeById,
         help
     };
-  }
-
-  @Override
-  public CommandResponseAttachment[] getAttachments() {
-    return attachments;
-  }
-
-  @Override
-  public String getIconUrl() {
-    return iconUrl;
-  }
-
-  @Override
-  public String getResponseType() {
-    return responseType;
-  }
-
-  @Override
-  public String getText() {
-    return text;
   }
 }

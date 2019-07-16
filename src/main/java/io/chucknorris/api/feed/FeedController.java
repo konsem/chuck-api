@@ -136,7 +136,9 @@ public class FeedController {
     String metricPrefix = "application_daily_chuck_";
 
     meterRegistry.gauge(metricPrefix + "member_count", mailingListStatistic.getMemberCount());
-    meterRegistry.gauge(metricPrefix + "unsubscribe_count", mailingListStatistic.getUnsubscribeCount());
+    meterRegistry.gauge(
+        metricPrefix + "unsubscribe_count", mailingListStatistic.getUnsubscribeCount()
+    );
     meterRegistry.gauge(metricPrefix + "cleaned_count", mailingListStatistic.getCleanedCount());
     meterRegistry.gauge(metricPrefix + "campaign_count", mailingListStatistic.getCampaignCount());
     meterRegistry.gauge(metricPrefix + "avg_sub_rate", mailingListStatistic.getAvgSubRate());

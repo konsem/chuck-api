@@ -77,10 +77,11 @@ public class SlackControllerTest {
         iconUrl = "https://assets.chucknorris.host/img/avatar/chuck-norris.png";
         jokeId = "bg_h3xursougaxzprcrl0q";
         jokeValue = "Chuck Norris programs do not accept input.";
-        joke = new Joke()
-            .setCategories(new String[]{"dev"})
-            .setId(jokeId)
-            .setValue(jokeValue);
+        joke = Joke.builder()
+            .categories(new String[]{"dev"})
+            .id(jokeId)
+            .value(jokeValue)
+            .build();
 
         when(meterRegistry.counter(
             anyString(), anyString(), anyString()
@@ -476,7 +477,9 @@ public class SlackControllerTest {
         String substitute = "Bob";
         String[] categories = new String[]{"dev", "explicit", "fashion", "food"};
 
-        joke.setValue(joke.getValue().replace("Chuck Norris", "Bob"));
+        joke = joke.toBuilder().value(
+            joke.getValue().replace("Chuck Norris", "Bob")
+        ).build();
 
         when(jokeRepository.findAllCategories()).thenReturn(categories);
         when(jokeService.randomPersonalizedJokeByCategories(

@@ -32,10 +32,11 @@ public class JokeServiceTest {
   public void setUp() throws Exception {
     jokeId = "ys--0t_-rrifz5jtcparbg";
     jokeValue = "Some people ask for a Kleenex when they sneeze, Chuck Norris asks for a body bag.";
-    joke = new Joke()
-        .setCategories(new String[]{"dev"})
-        .setId(jokeId)
-        .setValue(jokeValue);
+    joke = Joke.builder()
+        .categories(new String[]{"dev"})
+        .id(jokeId)
+        .value(jokeValue)
+        .build();
   }
 
   @Test

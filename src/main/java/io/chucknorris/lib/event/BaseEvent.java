@@ -1,7 +1,9 @@
 package io.chucknorris.lib.event;
 
 import java.io.Serializable;
+import lombok.Getter;
 
+@Getter
 public class BaseEvent implements Event, Serializable {
 
   private String name;
@@ -10,13 +12,5 @@ public class BaseEvent implements Event, Serializable {
   public BaseEvent(String name, Object payload) {
     this.name = name;
     this.payload = payload;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public Object getPayload() {
-    return payload;
   }
 }

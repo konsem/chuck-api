@@ -2,7 +2,9 @@ package io.chucknorris.api.slack;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
+import lombok.Data;
 
+@Data
 public class AccessToken implements Serializable {
 
   @JsonProperty("access_token")
@@ -22,48 +24,4 @@ public class AccessToken implements Serializable {
 
   @JsonProperty("user_name")
   private String userName;
-
-  public String getAccessToken() {
-    return accessToken;
-  }
-
-  public void setAccessToken(String accessToken) {
-    this.accessToken = accessToken;
-  }
-
-  public String getScope() {
-    return scope;
-  }
-
-  public void setScope(String scope) {
-    this.scope = scope;
-  }
-
-  public String getTeamId() {
-    return teamId;
-  }
-
-  public void setTeamId(String teamId) {
-    this.teamId = teamId;
-  }
-
-  public String getUserId() {
-    return userId;
-  }
-
-  public void setUserId(String userId) {
-    this.userId = userId;
-  }
-
-  public String getUserName() {
-    return userName;
-  }
-
-  public String getTeamName() {
-    return teamName;
-  }
-
-  public void setTeamName(String teamName) {
-    this.teamName = teamName;
-  }
 }
