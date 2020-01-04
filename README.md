@@ -1,6 +1,4 @@
-[![Donate to this project using patreon.com](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/matchilling) [![Build Status](https://travis-ci.org/chucknorris-io/chuck-api.svg?branch=master)](https://travis-ci.org/chucknorris-io/chuck-api)
-
-# CHUCKNORRIS.IO
+# CHUCKNORRIS.IO [![CircleCI](https://circleci.com/gh/chucknorris-io/chuck-api.svg?style=svg)](https://circleci.com/gh/chucknorris-io/chuck-api)
 
 [chucknorris.io](https://api.chucknorris.io) is a free JSON API for hand curated Chuck Norris facts.
 
@@ -19,32 +17,32 @@ beard, and his role in the action television series Walker, Texas Ranger.
 # Retrieve a random chuck joke
 $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/random' \
-       --header 'accept: (application/json|text/plain)'
+       --header 'accept: application/json'
 
 # Retrieve a random chuck joke by one or more categories
 $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/random?category=dev,explicit' \
-       --header 'accept: (application/json|text/plain)'
+       --header 'accept: application/json'
 
 # Retrieve a random personalized chuck joke
 $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/random?name=Bob' \
-       --header 'accept: (application/json|text/plain)'
+       --header 'accept: application/json'
 
 # Retrieve a random personalized chuck joke by one or more categories
 $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/random?name=Bob&category=dev,explicit' \
-       --header 'accept: (application/json|text/plain)'
+       --header 'accept: application/jso'
 
 # Retrieve a list of available categories
 $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/categories' \
-       --header 'accept: (application/json|text/plain)'
+       --header 'accept: application/json'
 
 # Free text search
 $ curl --request GET \
        --url 'https://api.chucknorris.io/jokes/search?query={query}' \
-       --header 'accept: (application/json|text/plain)'
+       --header 'accept: application/json'
 ```
 
 Example response:
@@ -73,8 +71,7 @@ $ docker-compose up     # Will run as a long running process
 $ docker-compose up -d  # Will run in background
 
 # Start the application itself
-$ mvn install
-$ java -jar -Dspring.profiles.active=development target/api-0.0.1.jar
+$ SPRING_PROFILES_ACTIVE=development ./gradlew clean bootRun
 ```
 
 **Urls:**
