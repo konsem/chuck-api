@@ -69,8 +69,6 @@ tasks {
         dependsOn bootJar
 
         def imageName = "${project.properties.group}/${appName}"
-
-        println(imageName)
         name = "${imageName}:latest"
 
         tag("current", "${imageName}:${appVer}")
