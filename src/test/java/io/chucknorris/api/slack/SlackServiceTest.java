@@ -49,7 +49,7 @@ public class SlackServiceTest {
         UriComponents authorizeUri = slackService.composeAuthorizeUri();
 
         assertEquals(
-            "https://slack.com/oauth/authorize/?client_id=slack.oauth.client_id&redirect_uri=slack.oauth.redirect_uri&scope=bot%20commands",
+            "https://slack.com/oauth/v2/authorize/?client_id=slack.oauth.client_id&redirect_uri=slack.oauth.redirect_uri&scope=commands",
             authorizeUri.toUriString()
         );
     }

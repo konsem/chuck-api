@@ -41,13 +41,13 @@ public class SlackService {
     MultiValueMap<String, String> urlQueryParams = new LinkedMultiValueMap<>();
     urlQueryParams.set("client_id", clientId);
     urlQueryParams.set("redirect_uri", redirectUrl);
-    urlQueryParams.set("scope", "bot commands");
+    urlQueryParams.set("scope", "commands");
 
     return UriComponentsBuilder
         .newInstance()
         .scheme("https")
         .host("slack.com")
-        .path("/oauth/authorize/")
+        .path("/oauth/v2/authorize/")
         .queryParams(urlQueryParams)
         .build()
         .encode();
