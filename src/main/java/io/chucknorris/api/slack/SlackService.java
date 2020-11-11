@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -75,9 +76,9 @@ public class SlackService {
    * Checks if a given category is whitelisted.
    */
   public Boolean isWhitelistedCategory(String category) {
-    return Arrays.stream(
+    return Arrays.asList(
         getWhitelistedCategories()
-    ).anyMatch(category::equals);
+    ).contains(category);
   }
 
   /**
@@ -94,13 +95,19 @@ public class SlackService {
     map.add("code", code);
     map.add("redirect_uri", redirectUrl);
 
-    ResponseEntity<AccessToken> responseEntity = restTemplate.exchange(
-        "https://slack.com/api/oauth.access",
-        HttpMethod.POST,
-        new HttpEntity<MultiValueMap<String, String>>(map, headers),
-        AccessToken.class
-    );
+    try {
+      ResponseEntity<AccessToken> responseEntity = restTemplate.exchange(
+          "https://slack.com/api/oauth.access",
+          HttpMethod.POST,
+          new HttpEntity<>(map, headers),
+          AccessToken.class
+      );
 
-    return responseEntity.getBody();
+      return responseEntity.getBody();
+    } catch (RestClientException exception) {
+      exception.printStackTrace();
+
+      return new AccessToken();
+    }
   }
 }
