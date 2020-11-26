@@ -123,7 +123,7 @@ public class SlackServiceTest {
         map.add("redirect_uri", "slack.oauth.redirect_uri");
 
         when(restTemplate.exchange(
-            "https://slack.com/api/oauth.access",
+            "https://slack.com/api/oauth.v2.access",
             HttpMethod.POST,
             new HttpEntity<MultiValueMap<String, String>>(map, headers),
             AccessToken.class
@@ -135,7 +135,7 @@ public class SlackServiceTest {
         assertEquals(accessToken, response);
 
         verify(restTemplate, times(1)).exchange(
-            "https://slack.com/api/oauth.access",
+            "https://slack.com/api/oauth.v2.access",
             HttpMethod.POST,
             new HttpEntity<MultiValueMap<String, String>>(map, headers),
             AccessToken.class
