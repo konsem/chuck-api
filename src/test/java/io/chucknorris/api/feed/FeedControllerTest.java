@@ -1,12 +1,5 @@
 package io.chucknorris.api.feed;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 import com.google.common.util.concurrent.AtomicDouble;
 import io.chucknorris.api.feed.dailychuck.DailyChuck;
 import io.chucknorris.api.feed.dailychuck.DailyChuckIssue;
@@ -17,13 +10,6 @@ import io.chucknorris.lib.DateUtil;
 import io.chucknorris.lib.event.EventService;
 import io.chucknorris.lib.mailchimp.MailchimpService;
 import io.chucknorris.lib.mailchimp.MailingListStatistic;
-import io.micrometer.core.instrument.MeterRegistry;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +17,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FeedControllerTest {
@@ -63,14 +59,11 @@ public class FeedControllerTest {
 
     private String mailingListId;
 
-    @Mock
-    private MeterRegistry meterRegistry;
-
     @Before
     public void setUp() throws ParseException {
         dailyChuckIssue = new DailyChuckIssue();
         dailyChuckIssue.setDate(
-            dateFormat.parse("2019-01-01")
+                dateFormat.parse("2019-01-01")
         );
         dailyChuckIssue.setJokeId("c5k7tulvqjs76evwb3brfg");
 
@@ -89,7 +82,7 @@ public class FeedControllerTest {
         mailingListStatistic.setAvgSubRate(new AtomicInteger(23));
         mailingListStatistic.setAvgUnsubRate(new AtomicInteger(7));
         mailingListStatistic.setClickRate(
-            new AtomicDouble(0.30748722)
+                new AtomicDouble(0.30748722)
         );
 
         when(mailchimpService.fetchListStats(mailingListId)).thenReturn(mailingListStatistic);
@@ -97,14 +90,13 @@ public class FeedControllerTest {
 
     @Test
     public void testDailyChuckJsonReturnsDailyChuckWithoutComposingANewIssueIfItHasAlreadyBeenIssued()
-        throws IOException, ParseException
-    {
+            throws IOException, ParseException {
         when(dailyChuckService.getDailyChuck()).thenReturn(dailyChuck);
         when(dateUtil.now()).thenReturn(dateFormat.parse("2019-01-01"));
 
         assertEquals(
-            dailyChuck,
-            feedController.dailyChuckJson()
+                dailyChuck,
+                feedController.dailyChuckJson()
         );
 
         verify(dailyChuckService, times(1)).getDailyChuck();
@@ -115,47 +107,11 @@ public class FeedControllerTest {
 
         verify(eventService, times(0)).publishEvent(any());
         verifyNoMoreInteractions(eventService);
-
-        verify(mailchimpService, times(1)).fetchListStats(mailingListId);
-        verifyNoMoreInteractions(mailchimpService);
-
-        String metricPrefix = "application_daily_chuck_";
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "member_count",
-            mailingListStatistic.getMemberCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "unsubscribe_count",
-            mailingListStatistic.getUnsubscribeCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "cleaned_count",
-            mailingListStatistic.getCleanedCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "campaign_count",
-            mailingListStatistic.getCampaignCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "avg_sub_rate",
-            mailingListStatistic.getAvgSubRate()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "avg_unsub_rate",
-            mailingListStatistic.getAvgUnsubRate()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "click_rate",
-            mailingListStatistic.getClickRate()
-        );
-        verifyNoMoreInteractions(meterRegistry);
-
     }
 
     @Test
     public void testDailyChuckJsonReturnsDailyChuckWithComposingANewIssue()
-        throws IOException, ParseException
-    {
+            throws IOException, ParseException {
         DailyChuckIssue newDailyChuckIssue = new DailyChuckIssue();
 
         when(dailyChuckService.getDailyChuck()).thenReturn(dailyChuck);
@@ -163,8 +119,8 @@ public class FeedControllerTest {
         when(dailyChuckService.composeDailyChuckIssue(any())).thenReturn(newDailyChuckIssue);
 
         assertEquals(
-            dailyChuck,
-            feedController.dailyChuckJson()
+                dailyChuck,
+                feedController.dailyChuckJson()
         );
 
         verify(dailyChuckService, times(1)).getDailyChuck();
@@ -177,46 +133,11 @@ public class FeedControllerTest {
 
         verify(eventService, times(1)).publishEvent(any());
         verifyNoMoreInteractions(eventService);
-
-        verify(mailchimpService, times(1)).fetchListStats(mailingListId);
-        verifyNoMoreInteractions(mailchimpService);
-
-        String metricPrefix = "application_daily_chuck_";
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "member_count",
-            mailingListStatistic.getMemberCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "unsubscribe_count",
-            mailingListStatistic.getUnsubscribeCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "cleaned_count",
-            mailingListStatistic.getCleanedCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "campaign_count",
-            mailingListStatistic.getCampaignCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "avg_sub_rate",
-            mailingListStatistic.getAvgSubRate()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "avg_unsub_rate",
-            mailingListStatistic.getAvgUnsubRate()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "click_rate",
-            mailingListStatistic.getClickRate()
-        );
-        verifyNoMoreInteractions(meterRegistry);
     }
 
     @Test
     public void testDailyChuckRssReturnsDailyChuckWithoutComposingANewIssueIfItHasAlreadyBeenIssued()
-        throws IOException, ParseException
-    {
+            throws IOException, ParseException {
         DailyChuckRss dailyChuckRss = new DailyChuckRss("", dailyChuck, jokeRepository);
 
         when(dailyChuckService.getDailyChuck()).thenReturn(dailyChuck);
@@ -224,8 +145,8 @@ public class FeedControllerTest {
         when(dailyChuckService.toRss(dailyChuck)).thenReturn(dailyChuckRss);
 
         assertEquals(
-            dailyChuckRss,
-            feedController.dailyChuckRss()
+                dailyChuckRss,
+                feedController.dailyChuckRss()
         );
 
         verify(dailyChuckService, times(1)).getDailyChuck();
@@ -239,43 +160,11 @@ public class FeedControllerTest {
 
         verify(mailchimpService, times(1)).fetchListStats(mailingListId);
         verifyNoMoreInteractions(mailchimpService);
-
-        String metricPrefix = "application_daily_chuck_";
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "member_count",
-            mailingListStatistic.getMemberCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "unsubscribe_count",
-            mailingListStatistic.getUnsubscribeCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "cleaned_count",
-            mailingListStatistic.getCleanedCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "campaign_count",
-            mailingListStatistic.getCampaignCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "avg_sub_rate",
-            mailingListStatistic.getAvgSubRate()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "avg_unsub_rate",
-            mailingListStatistic.getAvgUnsubRate()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "click_rate",
-            mailingListStatistic.getClickRate()
-        );
-        verifyNoMoreInteractions(meterRegistry);
     }
 
     @Test
     public void testDailyChuckRssReturnsDailyChuckWithComposingANewIssue()
-        throws IOException, ParseException
-    {
+            throws IOException, ParseException {
         DailyChuckRss dailyChuckRss = new DailyChuckRss("", dailyChuck, jokeRepository);
         DailyChuckIssue newDailyChuckIssue = new DailyChuckIssue();
 
@@ -285,8 +174,8 @@ public class FeedControllerTest {
         when(dailyChuckService.toRss(dailyChuck)).thenReturn(dailyChuckRss);
 
         assertEquals(
-            dailyChuckRss,
-            feedController.dailyChuckRss()
+                dailyChuckRss,
+                feedController.dailyChuckRss()
         );
 
         verify(dailyChuckService, times(1)).getDailyChuck();
@@ -303,37 +192,6 @@ public class FeedControllerTest {
 
         verify(mailchimpService, times(1)).fetchListStats(mailingListId);
         verifyNoMoreInteractions(mailchimpService);
-
-        String metricPrefix = "application_daily_chuck_";
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "member_count",
-            mailingListStatistic.getMemberCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "unsubscribe_count",
-            mailingListStatistic.getUnsubscribeCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "cleaned_count",
-            mailingListStatistic.getCleanedCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "campaign_count",
-            mailingListStatistic.getCampaignCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "avg_sub_rate",
-            mailingListStatistic.getAvgSubRate()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "avg_unsub_rate",
-            mailingListStatistic.getAvgUnsubRate()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "click_rate",
-            mailingListStatistic.getClickRate()
-        );
-        verifyNoMoreInteractions(meterRegistry);
     }
 
     @Test
@@ -343,36 +201,5 @@ public class FeedControllerTest {
 
         verify(mailchimpService, times(1)).fetchListStats(mailingListId);
         verifyNoMoreInteractions(mailchimpService);
-
-        String metricPrefix = "application_daily_chuck_";
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "member_count",
-            mailingListStatistic.getMemberCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "unsubscribe_count",
-            mailingListStatistic.getUnsubscribeCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "cleaned_count",
-            mailingListStatistic.getCleanedCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "campaign_count",
-            mailingListStatistic.getCampaignCount()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "avg_sub_rate",
-            mailingListStatistic.getAvgSubRate()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "avg_unsub_rate",
-            mailingListStatistic.getAvgUnsubRate()
-        );
-        verify(meterRegistry, times(1)).gauge(
-            metricPrefix + "click_rate",
-            mailingListStatistic.getClickRate()
-        );
-        verifyNoMoreInteractions(meterRegistry);
     }
 }

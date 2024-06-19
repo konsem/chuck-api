@@ -1,12 +1,15 @@
 package io.chucknorris.api.configuration;
 
-public interface DataSourceProperties {
+import org.springframework.context.annotation.Configuration;
 
-    String getDriverClassName();
+@Configuration
+public abstract class DataSourceProperties {
 
-    String getPassword();
+    abstract String getDriverClassName();
 
-    String getUrl();
+    abstract String getPassword();
 
-    String getUsername();
+    abstract String getUrl();
+
+    abstract String getUsername();
 }

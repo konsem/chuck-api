@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Data
 @Getter
-public class DefaultDataSourceProperties implements DataSourceProperties {
+public class DefaultDataSourceProperties extends DataSourceProperties {
 
     private String driverClassName;
     private String password;

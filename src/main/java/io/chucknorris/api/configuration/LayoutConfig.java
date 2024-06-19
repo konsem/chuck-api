@@ -1,13 +1,14 @@
 package io.chucknorris.api.configuration;
 
+import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
 
 @Configuration
-public class RestTemplateConfig {
+public class LayoutConfig {
 
-    public @Bean RestTemplate restTemplate() {
-        return new RestTemplate();
+    @Bean
+    public LayoutDialect layoutDialect() {
+        return new LayoutDialect();
     }
 }

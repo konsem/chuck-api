@@ -2,7 +2,6 @@ package io.chucknorris.api.configuration;
 
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 
 @Configuration
-@EnableConfigurationProperties(DataSourceProperties.class)
 @EnableJpaRepositories(basePackages = "io.chucknorris")
 @EnableTransactionManagement
 @Slf4j

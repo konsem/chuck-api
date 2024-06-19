@@ -8,7 +8,6 @@ import io.chucknorris.lib.DateUtil;
 import io.chucknorris.lib.event.EventService;
 import io.chucknorris.lib.mailchimp.MailchimpService;
 import io.chucknorris.lib.mailchimp.MailingListStatistic;
-import io.micrometer.core.instrument.MeterRegistry;
 import java.io.IOException;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +25,6 @@ public class FeedController {
   private DateUtil dateUtil;
   private EventService eventService;
   private MailchimpService mailchimpService;
-  private MeterRegistry meterRegistry;
 
   @Value("${mailchimp.dailychuck.list_id}")
   private String dailyChuckListId;
@@ -38,14 +36,12 @@ public class FeedController {
       DailyChuckService dailyChuckService,
       DateUtil dateUtil,
       EventService eventService,
-      MailchimpService mailchimpService,
-      MeterRegistry meterRegistry
+      MailchimpService mailchimpService
   ) {
     this.dailyChuckService = dailyChuckService;
     this.dateUtil = dateUtil;
     this.eventService = eventService;
     this.mailchimpService = mailchimpService;
-    this.meterRegistry = meterRegistry;
   }
 
   /**
@@ -61,9 +57,6 @@ public class FeedController {
       produces = MediaType.APPLICATION_JSON_VALUE
   ) DailyChuck dailyChuckJson() throws IOException {
     DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
-
-    MailingListStatistic mailingListStatistic = mailchimpService.fetchListStats(dailyChuckListId);
-    updateDailyChuckMetric(mailingListStatistic);
 
     Date now = dateUtil.now();
     if (dailyChuck.findIssueByDate(now) instanceof DailyChuckIssue) {
@@ -94,8 +87,6 @@ public class FeedController {
   ) MailingListStatistic dailyChuckStats() {
     MailingListStatistic mailingListStatistic = mailchimpService.fetchListStats(dailyChuckListId);
 
-    updateDailyChuckMetric(mailingListStatistic);
-
     return mailingListStatistic;
   }
 
@@ -114,7 +105,6 @@ public class FeedController {
     DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
 
     MailingListStatistic mailingListStatistic = mailchimpService.fetchListStats(dailyChuckListId);
-    updateDailyChuckMetric(mailingListStatistic);
 
     Date now = dateUtil.now();
     if (dailyChuck.findIssueByDate(now) instanceof DailyChuckIssue) {
@@ -130,19 +120,5 @@ public class FeedController {
     eventService.publishEvent(new DailyChuckPublishedEvent(dailyChuckIssue));
 
     return dailyChuckService.toRss(dailyChuck);
-  }
-
-  private void updateDailyChuckMetric(MailingListStatistic mailingListStatistic) {
-    String metricPrefix = "application_daily_chuck_";
-
-    meterRegistry.gauge(metricPrefix + "member_count", mailingListStatistic.getMemberCount());
-    meterRegistry.gauge(
-        metricPrefix + "unsubscribe_count", mailingListStatistic.getUnsubscribeCount()
-    );
-    meterRegistry.gauge(metricPrefix + "cleaned_count", mailingListStatistic.getCleanedCount());
-    meterRegistry.gauge(metricPrefix + "campaign_count", mailingListStatistic.getCampaignCount());
-    meterRegistry.gauge(metricPrefix + "avg_sub_rate", mailingListStatistic.getAvgSubRate());
-    meterRegistry.gauge(metricPrefix + "avg_unsub_rate", mailingListStatistic.getAvgUnsubRate());
-    meterRegistry.gauge(metricPrefix + "click_rate", mailingListStatistic.getClickRate());
   }
 }

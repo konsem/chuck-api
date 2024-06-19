@@ -12,7 +12,7 @@ import java.net.URI;
 @Configuration
 @Data
 @Getter
-public class HerokuDataSourceProperties implements DataSourceProperties {
+public class HerokuDataSourceProperties extends DataSourceProperties {
 
     private static final String SCHEMA_POSTGRESQL = "postgresql";
 

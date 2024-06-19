@@ -1,24 +1,10 @@
 package io.chucknorris.api.slack;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.chucknorris.api.joke.Joke;
 import io.chucknorris.api.joke.JokeRepository;
 import io.chucknorris.api.joke.JokeService;
 import io.chucknorris.lib.event.EventService;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,14 +19,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
+
 @RunWith(MockitoJUnitRunner.class)
 public class SlackControllerTest {
 
     private static String iconUrl, jokeId, jokeValue;
     private static Joke joke;
-
-    @Mock
-    private Counter counter;
 
     @Mock
     private EventService eventService;
@@ -51,9 +42,6 @@ public class SlackControllerTest {
     @Mock
     private JokeRepository jokeRepository;
 
-    @Mock
-    private MeterRegistry meterRegistry;
-
     @InjectMocks
     private SlackController slackController;
 
@@ -61,13 +49,13 @@ public class SlackControllerTest {
     private SlackService slackService;
 
     private String[] whiteListedCategories = new String[]{
-        "career",
-        "dev",
-        "fashion",
-        "food",
-        "money",
-        "movie",
-        "travel"
+            "career",
+            "dev",
+            "fashion",
+            "food",
+            "money",
+            "movie",
+            "travel"
     };
 
     @Before
@@ -78,35 +66,27 @@ public class SlackControllerTest {
         jokeId = "bg_h3xursougaxzprcrl0q";
         jokeValue = "Chuck Norris programs do not accept input.";
         joke = Joke.builder()
-            .categories(new String[]{"dev"})
-            .id(jokeId)
-            .value(jokeValue)
-            .build();
-
-        when(meterRegistry.counter(
-            anyString(), anyString(), anyString()
-        )).thenReturn(counter);
-
-        when(meterRegistry.counter(
-            anyString(), anyString(), anyString(), anyString(), anyString()
-        )).thenReturn(counter);
+                .categories(new String[]{"dev"})
+                .id(jokeId)
+                .value(jokeValue)
+                .build();
 
         when(
-            slackService.getWhitelistedCategories()
+                slackService.getWhitelistedCategories()
         ).thenReturn(
-            whiteListedCategories
+                whiteListedCategories
         );
 
         when(
-            slackService.filterNonWhitelistedCategories(new String[]{"dev", "fashion", "food"})
+                slackService.filterNonWhitelistedCategories(new String[]{"dev", "fashion", "food"})
         ).thenReturn(
-            new String[]{"dev", "fashion", "food"}
+                new String[]{"dev", "fashion", "food"}
         );
 
         when(
-            slackService.filterNonWhitelistedCategories(new String[]{"dev", "explicit", "fashion", "food"})
+                slackService.filterNonWhitelistedCategories(new String[]{"dev", "explicit", "fashion", "food"})
         ).thenReturn(
-            new String[]{"dev", "fashion", "food"}
+                new String[]{"dev", "fashion", "food"}
         );
     }
 
@@ -130,13 +110,6 @@ public class SlackControllerTest {
 
         verify(eventService, times(1)).publishEvent(any(SlackConnectEvent.class));
         verifyNoMoreInteractions(eventService);
-
-        verify(meterRegistry, times(1)).counter(
-            "application_slack_connect", "team_name", "ACME"
-        );
-        verifyNoMoreInteractions(meterRegistry);
-        verify(counter, times(1)).increment();
-        verifyNoMoreInteractions(counter);
     }
 
     @Test
@@ -245,18 +218,10 @@ public class SlackControllerTest {
         assertEquals(jokeValue, commandResponseAttachment.getText());
         assertEquals("[permalink]", commandResponseAttachment.getTitle());
         assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+joke", commandResponseAttachment
-            .getTitleLink());
+                .getTitleLink());
 
         verify(slackService, times(1)).getWhitelistedCategories();
         verifyNoMoreInteractions(slackService);
-
-        verify(meterRegistry, times(1)).counter(
-            "application_slack_command", "command_type", "random_joke", "team_name", "ACME"
-        );
-        verifyNoMoreInteractions(meterRegistry);
-
-        verify(counter, times(1)).increment();
-        verifyNoMoreInteractions(counter);
     }
 
     @Test
@@ -277,18 +242,10 @@ public class SlackControllerTest {
         assertEquals(jokeValue, commandResponseAttachment.getText());
         assertEquals("[permalink]", commandResponseAttachment.getTitle());
         assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+joke", commandResponseAttachment
-            .getTitleLink());
+                .getTitleLink());
 
         verify(slackService, times(1)).getWhitelistedCategories();
         verifyNoMoreInteractions(slackService);
-
-        verify(meterRegistry, times(1)).counter(
-            "application_slack_command", "command_type", "random_joke", "team_name", "ACME"
-        );
-        verifyNoMoreInteractions(meterRegistry);
-
-        verify(counter, times(1)).increment();
-        verifyNoMoreInteractions(counter);
     }
 
     @Test
@@ -314,7 +271,7 @@ public class SlackControllerTest {
         assertEquals(jokeValue, commandResponseAttachment.getText());
         assertEquals("[permalink]", commandResponseAttachment.getTitle());
         assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+joke+category", commandResponseAttachment
-            .getTitleLink());
+                .getTitleLink());
 
         verify(slackService, times(1)).isWhitelistedCategory("dev");
         verify(slackService, times(1)).filterNonWhitelistedCategories(categories);
@@ -325,14 +282,6 @@ public class SlackControllerTest {
 
         verify(jokeService, times(1)).randomJokeByCategory("dev");
         verifyNoMoreInteractions(jokeService);
-
-        verify(meterRegistry, times(1)).counter(
-            "application_slack_command", "command_type", "random_joke_by_category", "team_name", "ACME"
-        );
-        verifyNoMoreInteractions(meterRegistry);
-
-        verify(counter, times(1)).increment();
-        verifyNoMoreInteractions(counter);
     }
 
     @Test
@@ -390,14 +339,6 @@ public class SlackControllerTest {
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals("Available categories are: `dev`, `fashion`, `food`. Type `/chuck {category_name}` to retrieve a random joke from within the given category.", response.getText());
         assertEquals(ResponseType.EPHEMERAL, response.getResponseType());
-
-        verify(meterRegistry, times(1)).counter(
-            "application_slack_command", "command_type", "find_all_categories", "team_name", "ACME"
-        );
-        verifyNoMoreInteractions(meterRegistry);
-
-        verify(counter, times(1)).increment();
-        verifyNoMoreInteractions(counter);
     }
 
     @Test
@@ -413,14 +354,6 @@ public class SlackControllerTest {
         assertEquals(iconUrl, response.getIconUrl());
         assertEquals("Available categories are: `dev`, `fashion`, `food`. Type `/chuck {category_name}` to retrieve a random joke from within the given category.", response.getText());
         assertEquals(ResponseType.EPHEMERAL, response.getResponseType());
-
-        verify(meterRegistry, times(1)).counter(
-            "application_slack_command", "command_type", "find_all_categories", "team_name", "ACME"
-        );
-        verifyNoMoreInteractions(meterRegistry);
-
-        verify(counter, times(1)).increment();
-        verifyNoMoreInteractions(counter);
     }
 
     @Test
@@ -441,18 +374,10 @@ public class SlackControllerTest {
         assertEquals(jokeValue, commandResponseAttachment.getText());
         assertEquals("[permalink]", commandResponseAttachment.getTitle());
         assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=joke+by+id", commandResponseAttachment
-            .getTitleLink());
+                .getTitleLink());
 
         verify(jokeRepository, times(1)).findById(jokeId);
         verifyNoMoreInteractions(jokeRepository);
-
-        verify(meterRegistry, times(1)).counter(
-            "application_slack_command", "command_type", "find_joke_by_id", "team_name", "ACME"
-        );
-        verifyNoMoreInteractions(meterRegistry);
-
-        verify(counter, times(1)).increment();
-        verifyNoMoreInteractions(counter);
     }
 
     @Test
@@ -478,13 +403,13 @@ public class SlackControllerTest {
         String[] categories = new String[]{"dev", "explicit", "fashion", "food"};
 
         joke = joke.toBuilder().value(
-            joke.getValue().replace("Chuck Norris", "Bob")
+                joke.getValue().replace("Chuck Norris", "Bob")
         ).build();
 
         when(jokeRepository.findAllCategories()).thenReturn(categories);
         when(jokeService.randomPersonalizedJokeByCategories(
-            substitute,
-            new String[]{"dev", "fashion", "food"}
+                substitute,
+                new String[]{"dev", "fashion", "food"}
         )).thenReturn(joke);
 
         Request request = new Request();
@@ -501,29 +426,21 @@ public class SlackControllerTest {
         assertEquals("Bob programs do not accept input.", commandResponseAttachment.getText());
         assertEquals("[permalink]", commandResponseAttachment.getTitle());
         assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=random+personalized+joke", commandResponseAttachment
-            .getTitleLink());
+                .getTitleLink());
 
         verify(jokeRepository, times(1)).findAllCategories();
         verifyNoMoreInteractions(jokeRepository);
 
         verify(slackService, times(1)).filterNonWhitelistedCategories(
-            new String[]{"dev", "explicit", "fashion", "food"}
+                new String[]{"dev", "explicit", "fashion", "food"}
         );
         verifyNoMoreInteractions(slackService);
 
         verify(jokeService, times(1)).randomPersonalizedJokeByCategories(
-            "Bob",
-            new String[]{"dev", "fashion", "food"}
+                "Bob",
+                new String[]{"dev", "fashion", "food"}
         );
         verifyNoMoreInteractions(jokeService);
-
-        verify(meterRegistry, times(1)).counter(
-            "application_slack_command", "command_type", "random_personalized_joke", "team_name", "ACME"
-        );
-        verifyNoMoreInteractions(meterRegistry);
-
-        verify(counter, times(1)).increment();
-        verifyNoMoreInteractions(counter);
     }
 
     @Test
@@ -532,15 +449,15 @@ public class SlackControllerTest {
         String[] categories = new String[]{"dev", "movie"};
 
         Pageable pageable = PageRequest.of(
-            0,
-            5,
-            Sort.unsorted()
+                0,
+                5,
+                Sort.unsorted()
         );
 
         when(jokeRepository.findAllCategories()).thenReturn(categories);
         when(slackService.filterNonWhitelistedCategories(categories)).thenReturn(categories);
         when(jokeService.searchWithCategoryFilter(query, categories, pageable)).thenReturn(
-            new PageImpl<>(Arrays.asList(joke, joke, joke))
+                new PageImpl<>(Arrays.asList(joke, joke, joke))
         );
 
         Request request = new Request();
@@ -558,7 +475,7 @@ public class SlackControllerTest {
             assertEquals(jokeValue, commandResponseAttachment.getText());
             assertEquals("(" + (i + 1) + ")", commandResponseAttachment.getTitle());
             assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=search+joke", commandResponseAttachment
-                .getTitleLink());
+                    .getTitleLink());
         }
 
         verify(jokeRepository, times(1)).findAllCategories();
@@ -568,19 +485,11 @@ public class SlackControllerTest {
         verifyNoMoreInteractions(slackService);
 
         verify(jokeService, times(1)).searchWithCategoryFilter(
-            query,
-            categories,
-            pageable
+                query,
+                categories,
+                pageable
         );
         verifyNoMoreInteractions(jokeService);
-
-        verify(meterRegistry, times(1)).counter(
-            "application_slack_command", "command_type", "search_joke", "team_name", "ACME"
-        );
-        verifyNoMoreInteractions(meterRegistry);
-
-        verify(counter, times(1)).increment();
-        verifyNoMoreInteractions(counter);
     }
 
     @Test
@@ -589,19 +498,19 @@ public class SlackControllerTest {
         String[] categories = new String[]{"dev", "movie"};
 
         Pageable pageable = PageRequest.of(
-            0,
-            5,
-            Sort.unsorted()
+                0,
+                5,
+                Sort.unsorted()
         );
 
         when(jokeRepository.findAllCategories()).thenReturn(categories);
         when(slackService.filterNonWhitelistedCategories(categories)).thenReturn(categories);
         when(jokeService.searchWithCategoryFilter(query, categories, pageable)).thenReturn(
-            new PageImpl(
-                Arrays.asList(joke, joke, joke, joke, joke),
-                pageable,
-                6
-            )
+                new PageImpl(
+                        Arrays.asList(joke, joke, joke, joke, joke),
+                        pageable,
+                        6
+                )
         );
 
         Request request = new Request();
@@ -619,7 +528,7 @@ public class SlackControllerTest {
             assertEquals(jokeValue, commandResponseAttachment.getText());
             assertEquals("(" + (i + 1) + ")", commandResponseAttachment.getTitle());
             assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=search+joke", commandResponseAttachment
-                .getTitleLink());
+                    .getTitleLink());
         }
 
         verify(slackService, times(1)).filterNonWhitelistedCategories(categories);
@@ -627,14 +536,6 @@ public class SlackControllerTest {
 
         verify(jokeService, times(1)).searchWithCategoryFilter(query, categories, pageable);
         verifyNoMoreInteractions(jokeService);
-
-        verify(meterRegistry, times(1)).counter(
-            "application_slack_command", "command_type", "search_joke", "team_name", "ACME"
-        );
-        verifyNoMoreInteractions(meterRegistry);
-
-        verify(counter, times(1)).increment();
-        verifyNoMoreInteractions(counter);
     }
 
     @Test
@@ -646,11 +547,11 @@ public class SlackControllerTest {
         when(jokeRepository.findAllCategories()).thenReturn(categories);
         when(slackService.filterNonWhitelistedCategories(categories)).thenReturn(categories);
         when(jokeService.searchWithCategoryFilter(query, categories, pageable)).thenReturn(
-            new PageImpl(
-                Arrays.asList(joke, joke, joke, joke, joke),
-                pageable,
-                15
-            )
+                new PageImpl(
+                        Arrays.asList(joke, joke, joke, joke, joke),
+                        pageable,
+                        15
+                )
         );
 
         Request request = new Request();
@@ -668,7 +569,7 @@ public class SlackControllerTest {
             assertEquals(jokeValue, commandResponseAttachment.getText());
             assertEquals("(" + (i + 1 + 5) + ")", commandResponseAttachment.getTitle());
             assertEquals("https://localhost/jokes/bg_h3xursougaxzprcrl0q?utm_source=slack&utm_medium=api&utm_term=ACME&utm_campaign=search+joke", commandResponseAttachment
-                .getTitleLink());
+                    .getTitleLink());
         }
 
         verify(jokeRepository, times(1)).findAllCategories();
@@ -679,14 +580,6 @@ public class SlackControllerTest {
 
         verify(jokeService, times(1)).searchWithCategoryFilter(query, categories, pageable);
         verifyNoMoreInteractions(jokeService);
-
-        verify(meterRegistry, times(1)).counter(
-            "application_slack_command", "command_type", "search_joke", "team_name", "ACME"
-        );
-        verifyNoMoreInteractions(meterRegistry);
-
-        verify(counter, times(1)).increment();
-        verifyNoMoreInteractions(counter);
     }
 
     @Test
@@ -695,15 +588,15 @@ public class SlackControllerTest {
         String[] categories = new String[]{"dev", "movie"};
 
         Pageable pageable = PageRequest.of(
-            0,
-            5,
-            Sort.unsorted()
+                0,
+                5,
+                Sort.unsorted()
         );
 
         when(jokeRepository.findAllCategories()).thenReturn(categories);
         when(slackService.filterNonWhitelistedCategories(categories)).thenReturn(categories);
         when(jokeService.searchWithCategoryFilter(query, categories, pageable)).thenReturn(
-            new PageImpl<>(new ArrayList<>())
+                new PageImpl<>(new ArrayList<>())
         );
 
         Request request = new Request();
@@ -723,9 +616,9 @@ public class SlackControllerTest {
         verifyNoMoreInteractions(slackService);
 
         verify(jokeService, times(1)).searchWithCategoryFilter(
-            query,
-            categories,
-            pageable
+                query,
+                categories,
+                pageable
         );
         verifyNoMoreInteractions(jokeService);
     }

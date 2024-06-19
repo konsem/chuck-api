@@ -1,4 +1,4 @@
-FROM azul/zulu-openjdk-alpine:17.0.4.1-17.36.17-jre-headless
+FROM azul/zulu-openjdk-alpine:21-jre-headless-latest
 
 ARG JAR_FILE
 COPY ${JAR_FILE} app.jar

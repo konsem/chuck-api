@@ -5,7 +5,6 @@ import com.amazonaws.services.sns.model.PublishRequest;
 import com.amazonaws.services.sns.model.PublishResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.micrometer.core.instrument.MeterRegistry;
 import java.text.SimpleDateFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,15 +16,12 @@ public class EventService {
 
   private static final Logger logger = LoggerFactory.getLogger(EventService.class);
 
-  private MeterRegistry meterRegistry;
-
   private AmazonSNSClient snsClient;
 
   @Value("${application.event.sns_topic_arn}")
   private String topicArn;
 
-  public EventService(MeterRegistry meterRegistry, AmazonSNSClient snsClient) {
-    this.meterRegistry = meterRegistry;
+  public EventService(AmazonSNSClient snsClient) {
     this.snsClient = snsClient;
   }
 
@@ -47,11 +43,6 @@ public class EventService {
     PublishRequest publishRequest = new PublishRequest(topicArn, message);
 
     PublishResult publishResult = snsClient.publish(publishRequest);
-
-    meterRegistry.counter(
-        "application.event.publish",
-        "event_name", event.getName()
-    ).increment();
 
     logger.info(
         "[event_published] "
