@@ -19,19 +19,21 @@ import org.springframework.data.domain.Pageable;
 @RunWith(MockitoJUnitRunner.class)
 public class JokeServiceTest {
 
-  private static String jokeId, jokeValue;
-  private static Joke joke;
+    private static String jokeId, jokeValue;
+    private static Joke joke;
 
-  @Mock private JokeRepository jokeRepository;
+    @Mock
+    private JokeRepository jokeRepository;
 
-  @InjectMocks private JokeService jokeService;
+    @InjectMocks
+    private JokeService jokeService;
 
-  @Before
-  public void setUp() throws Exception {
-    jokeId = "ys--0t_-rrifz5jtcparbg";
-    jokeValue = "Some people ask for a Kleenex when they sneeze, Chuck Norris asks for a body bag.";
-    joke = Joke.builder().categories(new String[] {"dev"}).id(jokeId).value(jokeValue).build();
-  }
+    @Before
+    public void setUp() throws Exception {
+        jokeId = "ys--0t_-rrifz5jtcparbg";
+        jokeValue = "Some people ask for a Kleenex when they sneeze, Chuck Norris asks for a body bag.";
+        joke = Joke.builder().categories(new String[] { "dev" }).id(jokeId).value(jokeValue).build();
+    }
 
   @Test
   public void testRandomJokeByCategoriesReturnsJoke() {
@@ -44,34 +46,34 @@ public class JokeServiceTest {
     verifyNoMoreInteractions(jokeRepository);
   }
 
-  @Test
-  public void testRandomPersonalizedJokeByCategoriesReturnsJoke() {
-    String substitute = "Bob";
-    String[] categories = new String[] {"dev", "movie"};
+    @Test
+    public void testRandomPersonalizedJokeByCategoriesReturnsJoke() {
+        String substitute = "Bob";
+        String[] categories = new String[] { "dev", "movie" };
 
-    joke.setValue(joke.getValue().replace("Chuck Norris", substitute));
-    when(jokeRepository.getRandomPersonalizedJokeByCategories(substitute, "dev,movie"))
-        .thenReturn(joke);
+        joke.setValue(joke.getValue().replace("Chuck Norris", substitute));
+        when(jokeRepository.getRandomPersonalizedJokeByCategories(substitute, "dev,movie"))
+                .thenReturn(joke);
 
-    Joke joke = jokeService.randomPersonalizedJokeByCategories(substitute, categories);
-    assertEquals(JokeServiceTest.joke, joke);
+        Joke joke = jokeService.randomPersonalizedJokeByCategories(substitute, categories);
+        assertEquals(JokeServiceTest.joke, joke);
 
-    verify(jokeRepository, times(1)).getRandomPersonalizedJokeByCategories(substitute, "dev,movie");
-    verifyNoMoreInteractions(jokeRepository);
-  }
+        verify(jokeRepository, times(1)).getRandomPersonalizedJokeByCategories(substitute, "dev,movie");
+        verifyNoMoreInteractions(jokeRepository);
+    }
 
-  @Test
-  public void testSearchWithCategoryFilter() {
-    String query = "Kleenex";
-    String[] categories = new String[] {"dev", "movie"};
-    Pageable pageable = PageRequest.of(1, 5);
+    @Test
+    public void testSearchWithCategoryFilter() {
+        String query = "Kleenex";
+        String[] categories = new String[] { "dev", "movie" };
+        Pageable pageable = PageRequest.of(1, 5);
 
-    when(jokeRepository.findByValueContainsAndFilter(query, "dev,movie", pageable))
-        .thenReturn(Page.empty());
+        when(jokeRepository.findByValueContainsAndFilter(query, "dev,movie", pageable))
+                .thenReturn(Page.empty());
 
-    jokeService.searchWithCategoryFilter(query, categories, pageable);
+        jokeService.searchWithCategoryFilter(query, categories, pageable);
 
-    verify(jokeRepository, times(1)).findByValueContainsAndFilter(query, "dev,movie", pageable);
-    verifyNoMoreInteractions(jokeRepository);
-  }
+        verify(jokeRepository, times(1)).findByValueContainsAndFilter(query, "dev,movie", pageable);
+        verifyNoMoreInteractions(jokeRepository);
+    }
 }

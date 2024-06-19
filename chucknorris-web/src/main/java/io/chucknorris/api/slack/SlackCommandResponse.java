@@ -2,11 +2,11 @@ package io.chucknorris.api.slack;
 
 public interface SlackCommandResponse {
 
-  SlackCommandResponseAttachment[] getAttachments();
+    SlackCommandResponseAttachment[] getAttachments();
 
-  String getIconUrl();
+    String getIconUrl();
 
-  String getResponseType();
+    String getResponseType();
 
-  String getText();
+    String getText();
 }

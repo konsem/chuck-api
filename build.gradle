@@ -10,8 +10,6 @@ buildscript {
     }
 }
 
-version = Git.commitHash()
-
 subprojects { Project project ->
     apply plugin: 'com.diffplug.spotless'
     apply plugin: 'io.spring.dependency-management'
@@ -19,7 +17,6 @@ subprojects { Project project ->
 
     sourceCompatibility = 17
     targetCompatibility = 17
-    version Git.commitHash()
 
     dependencyManagement {
         imports { mavenBom("org.springframework.boot:spring-boot-dependencies:${Version.SPRING_BOOT}") }
@@ -29,7 +26,7 @@ subprojects { Project project ->
         mavenCentral()
     }
 
-    tasks.withType(Test) {
+    tasks.withType(Test).configureEach {
         useJUnitPlatform()
 
         testLogging {
@@ -39,7 +36,7 @@ subprojects { Project project ->
 
     spotless {
         java {
-            googleJavaFormat()
+            eclipse().configFile('../format.xml')
         }
     }
 }

@@ -15,22 +15,21 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @Slf4j
 public class DataSourceConfiguration {
 
-  @Bean
-  public DataSource dataSource(DataSourceProperties dataSourceProperties) {
-    log.info(
-        "Loading data source properties from {}", dataSourceProperties.getClass().getSimpleName());
+    @Bean
+    public DataSource dataSource(DataSourceProperties dataSourceProperties) {
+        log.info(
+                "Loading data source properties from {}", dataSourceProperties.getClass().getSimpleName());
 
-    DataSource datasource =
-        DataSourceBuilder.create()
-            .driverClassName(dataSourceProperties.getDriverClassName())
-            .password(dataSourceProperties.getPassword())
-            .type(HikariDataSource.class)
-            .url(dataSourceProperties.getUrl())
-            .username(dataSourceProperties.getUsername())
-            .build();
+        DataSource datasource = DataSourceBuilder.create()
+                .driverClassName(dataSourceProperties.getDriverClassName())
+                .password(dataSourceProperties.getPassword())
+                .type(HikariDataSource.class)
+                .url(dataSourceProperties.getUrl())
+                .username(dataSourceProperties.getUsername())
+                .build();
 
-    log.info(String.format("DataSource({url=%s})", dataSourceProperties.getUrl()));
+        log.info(String.format("DataSource({url=%s})", dataSourceProperties.getUrl()));
 
-    return datasource;
-  }
+        return datasource;
+    }
 }

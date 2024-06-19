@@ -30,52 +30,58 @@ import org.springframework.test.util.ReflectionTestUtils;
 @RunWith(MockitoJUnitRunner.class)
 public class FeedControllerTest {
 
-  private DailyChuck dailyChuck;
+    private DailyChuck dailyChuck;
 
-  private DailyChuckIssue dailyChuckIssue;
+    private DailyChuckIssue dailyChuckIssue;
 
-  @Mock private DailyChuckService dailyChuckService;
+    @Mock
+    private DailyChuckService dailyChuckService;
 
-  @Mock private DateUtil dateUtil;
+    @Mock
+    private DateUtil dateUtil;
 
-  private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
-  @Mock private EventService eventService;
+    @Mock
+    private EventService eventService;
 
-  @InjectMocks private FeedController feedController;
+    @InjectMocks
+    private FeedController feedController;
 
-  @Mock private JokeRepository jokeRepository;
+    @Mock
+    private JokeRepository jokeRepository;
 
-  @Mock private MailchimpService mailchimpService;
+    @Mock
+    private MailchimpService mailchimpService;
 
-  private MailingListStatistic mailingListStatistic;
+    private MailingListStatistic mailingListStatistic;
 
-  private String mailingListId;
+    private String mailingListId;
 
-  @Before
-  public void setUp() throws ParseException {
-    dailyChuckIssue = new DailyChuckIssue();
-    dailyChuckIssue.setDate(dateFormat.parse("2019-01-01"));
-    dailyChuckIssue.setJokeId("c5k7tulvqjs76evwb3brfg");
+    @Before
+    public void setUp() throws ParseException {
+        dailyChuckIssue = new DailyChuckIssue();
+        dailyChuckIssue.setDate(dateFormat.parse("2019-01-01"));
+        dailyChuckIssue.setJokeId("c5k7tulvqjs76evwb3brfg");
 
-    dailyChuck = new DailyChuck();
-    dailyChuck.setIssues(new DailyChuckIssue[] {dailyChuckIssue});
-    dailyChuck.setIssueNumber(Long.valueOf(1));
+        dailyChuck = new DailyChuck();
+        dailyChuck.setIssues(new DailyChuckIssue[] { dailyChuckIssue });
+        dailyChuck.setIssueNumber(Long.valueOf(1));
 
-    ReflectionTestUtils.setField(feedController, "dailyChuckListId", "xxxxxxxxxx");
+        ReflectionTestUtils.setField(feedController, "dailyChuckListId", "xxxxxxxxxx");
 
-    mailingListId = "xxxxxxxxxx";
-    mailingListStatistic = new MailingListStatistic();
-    mailingListStatistic.setMemberCount(new AtomicInteger(228));
-    mailingListStatistic.setUnsubscribeCount(new AtomicInteger(122));
-    mailingListStatistic.setCleanedCount(new AtomicInteger(48));
-    mailingListStatistic.setCampaignCount(new AtomicInteger(465));
-    mailingListStatistic.setAvgSubRate(new AtomicInteger(23));
-    mailingListStatistic.setAvgUnsubRate(new AtomicInteger(7));
-    mailingListStatistic.setClickRate(new AtomicDouble(0.30748722));
+        mailingListId = "xxxxxxxxxx";
+        mailingListStatistic = new MailingListStatistic();
+        mailingListStatistic.setMemberCount(new AtomicInteger(228));
+        mailingListStatistic.setUnsubscribeCount(new AtomicInteger(122));
+        mailingListStatistic.setCleanedCount(new AtomicInteger(48));
+        mailingListStatistic.setCampaignCount(new AtomicInteger(465));
+        mailingListStatistic.setAvgSubRate(new AtomicInteger(23));
+        mailingListStatistic.setAvgUnsubRate(new AtomicInteger(7));
+        mailingListStatistic.setClickRate(new AtomicDouble(0.30748722));
 
-    when(mailchimpService.fetchListStats(mailingListId)).thenReturn(mailingListStatistic);
-  }
+        when(mailchimpService.fetchListStats(mailingListId)).thenReturn(mailingListStatistic);
+    }
 
   @Test
   public void testDailyChuckJsonReturnsDailyChuckWithoutComposingANewIssueIfItHasAlreadyBeenIssued()
@@ -95,88 +101,88 @@ public class FeedControllerTest {
     verifyNoMoreInteractions(eventService);
   }
 
-  @Test
-  public void testDailyChuckJsonReturnsDailyChuckWithComposingANewIssue()
-      throws IOException, ParseException {
-    DailyChuckIssue newDailyChuckIssue = new DailyChuckIssue();
+    @Test
+    public void testDailyChuckJsonReturnsDailyChuckWithComposingANewIssue()
+            throws IOException, ParseException {
+        DailyChuckIssue newDailyChuckIssue = new DailyChuckIssue();
 
-    when(dailyChuckService.getDailyChuck()).thenReturn(dailyChuck);
-    when(dateUtil.now()).thenReturn(dateFormat.parse("2019-01-02"));
-    when(dailyChuckService.composeDailyChuckIssue(any())).thenReturn(newDailyChuckIssue);
+        when(dailyChuckService.getDailyChuck()).thenReturn(dailyChuck);
+        when(dateUtil.now()).thenReturn(dateFormat.parse("2019-01-02"));
+        when(dailyChuckService.composeDailyChuckIssue(any())).thenReturn(newDailyChuckIssue);
 
-    assertEquals(dailyChuck, feedController.dailyChuckJson());
+        assertEquals(dailyChuck, feedController.dailyChuckJson());
 
-    verify(dailyChuckService, times(1)).getDailyChuck();
-    verify(dailyChuckService, times(1)).composeDailyChuckIssue(any());
-    verify(dailyChuckService, times(1)).persist(dailyChuck);
-    verifyNoMoreInteractions(dailyChuckService);
+        verify(dailyChuckService, times(1)).getDailyChuck();
+        verify(dailyChuckService, times(1)).composeDailyChuckIssue(any());
+        verify(dailyChuckService, times(1)).persist(dailyChuck);
+        verifyNoMoreInteractions(dailyChuckService);
 
-    verify(dateUtil, times(1)).now();
-    verifyNoMoreInteractions(dateUtil);
+        verify(dateUtil, times(1)).now();
+        verifyNoMoreInteractions(dateUtil);
 
-    verify(eventService, times(1)).publishEvent(any());
-    verifyNoMoreInteractions(eventService);
-  }
+        verify(eventService, times(1)).publishEvent(any());
+        verifyNoMoreInteractions(eventService);
+    }
 
-  @Test
-  public void testDailyChuckRssReturnsDailyChuckWithoutComposingANewIssueIfItHasAlreadyBeenIssued()
-      throws IOException, ParseException {
-    DailyChuckRss dailyChuckRss = new DailyChuckRss("", dailyChuck, jokeRepository);
+    @Test
+    public void testDailyChuckRssReturnsDailyChuckWithoutComposingANewIssueIfItHasAlreadyBeenIssued()
+            throws IOException, ParseException {
+        DailyChuckRss dailyChuckRss = new DailyChuckRss("", dailyChuck, jokeRepository);
 
-    when(dailyChuckService.getDailyChuck()).thenReturn(dailyChuck);
-    when(dateUtil.now()).thenReturn(dateFormat.parse("2019-01-01"));
-    when(dailyChuckService.toRss(dailyChuck)).thenReturn(dailyChuckRss);
+        when(dailyChuckService.getDailyChuck()).thenReturn(dailyChuck);
+        when(dateUtil.now()).thenReturn(dateFormat.parse("2019-01-01"));
+        when(dailyChuckService.toRss(dailyChuck)).thenReturn(dailyChuckRss);
 
-    assertEquals(dailyChuckRss, feedController.dailyChuckRss());
+        assertEquals(dailyChuckRss, feedController.dailyChuckRss());
 
-    verify(dailyChuckService, times(1)).getDailyChuck();
-    verify(dailyChuckService, times(1)).toRss(dailyChuck);
+        verify(dailyChuckService, times(1)).getDailyChuck();
+        verify(dailyChuckService, times(1)).toRss(dailyChuck);
 
-    verify(dateUtil, times(1)).now();
-    verifyNoMoreInteractions(dateUtil);
+        verify(dateUtil, times(1)).now();
+        verifyNoMoreInteractions(dateUtil);
 
-    verify(eventService, times(0)).publishEvent(any());
-    verifyNoMoreInteractions(eventService);
+        verify(eventService, times(0)).publishEvent(any());
+        verifyNoMoreInteractions(eventService);
 
-    verify(mailchimpService, times(1)).fetchListStats(mailingListId);
-    verifyNoMoreInteractions(mailchimpService);
-  }
+        verify(mailchimpService, times(1)).fetchListStats(mailingListId);
+        verifyNoMoreInteractions(mailchimpService);
+    }
 
-  @Test
-  public void testDailyChuckRssReturnsDailyChuckWithComposingANewIssue()
-      throws IOException, ParseException {
-    DailyChuckRss dailyChuckRss = new DailyChuckRss("", dailyChuck, jokeRepository);
-    DailyChuckIssue newDailyChuckIssue = new DailyChuckIssue();
+    @Test
+    public void testDailyChuckRssReturnsDailyChuckWithComposingANewIssue()
+            throws IOException, ParseException {
+        DailyChuckRss dailyChuckRss = new DailyChuckRss("", dailyChuck, jokeRepository);
+        DailyChuckIssue newDailyChuckIssue = new DailyChuckIssue();
 
-    when(dailyChuckService.getDailyChuck()).thenReturn(dailyChuck);
-    when(dateUtil.now()).thenReturn(dateFormat.parse("2019-01-02"));
-    when(dailyChuckService.composeDailyChuckIssue(any())).thenReturn(newDailyChuckIssue);
-    when(dailyChuckService.toRss(dailyChuck)).thenReturn(dailyChuckRss);
+        when(dailyChuckService.getDailyChuck()).thenReturn(dailyChuck);
+        when(dateUtil.now()).thenReturn(dateFormat.parse("2019-01-02"));
+        when(dailyChuckService.composeDailyChuckIssue(any())).thenReturn(newDailyChuckIssue);
+        when(dailyChuckService.toRss(dailyChuck)).thenReturn(dailyChuckRss);
 
-    assertEquals(dailyChuckRss, feedController.dailyChuckRss());
+        assertEquals(dailyChuckRss, feedController.dailyChuckRss());
 
-    verify(dailyChuckService, times(1)).getDailyChuck();
-    verify(dailyChuckService, times(1)).composeDailyChuckIssue(any());
-    verify(dailyChuckService, times(1)).persist(dailyChuck);
-    verify(dailyChuckService, times(1)).toRss(dailyChuck);
-    verifyNoMoreInteractions(dailyChuckService);
+        verify(dailyChuckService, times(1)).getDailyChuck();
+        verify(dailyChuckService, times(1)).composeDailyChuckIssue(any());
+        verify(dailyChuckService, times(1)).persist(dailyChuck);
+        verify(dailyChuckService, times(1)).toRss(dailyChuck);
+        verifyNoMoreInteractions(dailyChuckService);
 
-    verify(dateUtil, times(1)).now();
-    verifyNoMoreInteractions(dateUtil);
+        verify(dateUtil, times(1)).now();
+        verifyNoMoreInteractions(dateUtil);
 
-    verify(eventService, times(1)).publishEvent(any());
-    verifyNoMoreInteractions(eventService);
+        verify(eventService, times(1)).publishEvent(any());
+        verifyNoMoreInteractions(eventService);
 
-    verify(mailchimpService, times(1)).fetchListStats(mailingListId);
-    verifyNoMoreInteractions(mailchimpService);
-  }
+        verify(mailchimpService, times(1)).fetchListStats(mailingListId);
+        verifyNoMoreInteractions(mailchimpService);
+    }
 
-  @Test
-  public void testDailyChuckStatsReturnsStats() {
-    MailingListStatistic response = feedController.dailyChuckStats();
-    assertEquals(response, mailingListStatistic);
+    @Test
+    public void testDailyChuckStatsReturnsStats() {
+        MailingListStatistic response = feedController.dailyChuckStats();
+        assertEquals(response, mailingListStatistic);
 
-    verify(mailchimpService, times(1)).fetchListStats(mailingListId);
-    verifyNoMoreInteractions(mailchimpService);
-  }
+        verify(mailchimpService, times(1)).fetchListStats(mailingListId);
+        verifyNoMoreInteractions(mailchimpService);
+    }
 }

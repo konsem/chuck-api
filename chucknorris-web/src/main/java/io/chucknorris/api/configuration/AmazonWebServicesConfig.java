@@ -13,29 +13,29 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AmazonWebServicesConfig {
 
-  @Value("${aws.access_key_id}")
-  private String accessKeyId;
+    @Value("${aws.access_key_id}")
+    private String accessKeyId;
 
-  @Value("${aws.access_key_secret}")
-  private String accessKeySecret;
+    @Value("${aws.access_key_secret}")
+    private String accessKeySecret;
 
-  @Value("${aws.region}")
-  private String region;
+    @Value("${aws.region}")
+    private String region;
 
-  /** Returns a new {@link AmazonS3} instance. */
-  public @Bean AmazonS3 amazonS3() {
-    AWSCredentials credentials = new BasicAWSCredentials(accessKeyId, accessKeySecret);
+    /** Returns a new {@link AmazonS3} instance. */
+    public @Bean AmazonS3 amazonS3() {
+        AWSCredentials credentials = new BasicAWSCredentials(accessKeyId, accessKeySecret);
 
-    return AmazonS3ClientBuilder.standard()
-        .withCredentials(new AWSStaticCredentialsProvider(credentials))
-        .withRegion(region)
-        .build();
-  }
+        return AmazonS3ClientBuilder.standard()
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .withRegion(region)
+                .build();
+    }
 
-  /** Returns a new {@link AmazonSNSClient} instance. */
-  public @Bean AmazonSNSClient snsClient() {
-    AWSCredentials credentials = new BasicAWSCredentials(accessKeyId, accessKeySecret);
+    /** Returns a new {@link AmazonSNSClient} instance. */
+    public @Bean AmazonSNSClient snsClient() {
+        AWSCredentials credentials = new BasicAWSCredentials(accessKeyId, accessKeySecret);
 
-    return new AmazonSNSClient(credentials);
-  }
+        return new AmazonSNSClient(credentials);
+    }
 }

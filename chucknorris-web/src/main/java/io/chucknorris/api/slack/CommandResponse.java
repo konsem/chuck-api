@@ -7,15 +7,15 @@ import lombok.Data;
 @Data
 public class CommandResponse implements SlackCommandResponse, Serializable {
 
-  @JsonProperty("icon_url")
-  private String iconUrl = "https://assets.chucknorris.host/img/avatar/chuck-norris.png";
+    @JsonProperty("icon_url")
+    private String iconUrl = "https://assets.chucknorris.host/img/avatar/chuck-norris.png";
 
-  @JsonProperty("text")
-  private String text;
+    @JsonProperty("text")
+    private String text;
 
-  @JsonProperty("attachments")
-  private SlackCommandResponseAttachment[] attachments;
+    @JsonProperty("attachments")
+    private SlackCommandResponseAttachment[] attachments;
 
-  @JsonProperty("response_type")
-  private String responseType = ResponseType.IN_CHANNEL;
+    @JsonProperty("response_type")
+    private String responseType = ResponseType.IN_CHANNEL;
 }

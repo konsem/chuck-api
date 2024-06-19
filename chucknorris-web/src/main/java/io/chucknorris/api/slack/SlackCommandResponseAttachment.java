@@ -2,23 +2,23 @@ package io.chucknorris.api.slack;
 
 public interface SlackCommandResponseAttachment {
 
-  String getFallback();
+    String getFallback();
 
-  void setFallback(String fallback);
+    void setFallback(String fallback);
 
-  String[] getMrkdownIn();
+    String[] getMrkdownIn();
 
-  void setMrkdownIn(String[] mrkdownIn);
+    void setMrkdownIn(String[] mrkdownIn);
 
-  String getText();
+    String getText();
 
-  void setText(String text);
+    void setText(String text);
 
-  String getTitle();
+    String getTitle();
 
-  void setTitle(String title);
+    void setTitle(String title);
 
-  String getTitleLink();
+    String getTitleLink();
 
-  void setTitleLink(String titleLink);
+    void setTitleLink(String titleLink);
 }

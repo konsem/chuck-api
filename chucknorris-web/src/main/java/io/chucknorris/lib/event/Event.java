@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public interface Event extends Serializable {
 
-  String getName();
+    String getName();
 
-  Object getPayload();
+    Object getPayload();
 }

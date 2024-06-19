@@ -7,12 +7,12 @@ import lombok.Data;
 @Data
 public class MailingList implements Serializable {
 
-  @JsonProperty("id")
-  private String id;
+    @JsonProperty("id")
+    private String id;
 
-  @JsonProperty("stats")
-  private MailingListStatistic mailingListStatistic;
+    @JsonProperty("stats")
+    private MailingListStatistic mailingListStatistic;
 
-  @JsonProperty("name")
-  private String name;
+    @JsonProperty("name")
+    private String name;
 }

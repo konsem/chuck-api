@@ -13,14 +13,30 @@ env:
   JAVA_VERSION: 21
 
 jobs:
-  test:
+  unit-test:
     runs-on: [ ubuntu-latest ]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
       - uses: actions/setup-java@v4
         with:
           cache: gradle
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
+      - run: ./gradlew clean test spotlessCheck --exclude-task :chucknorris-integration-test:test
+
+  integration-test:
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - uses: actions/checkout@v4
+        with:
           ref: ${{ inputs.version }}
-      - run: ./gradlew test spotlessCheck
+      - uses: actions/setup-java@v4
+        with:
+          cache: gradle
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          java-version: ${{ env.JAVA_VERSION }}
+      - name: Run Integration Test
+        shell: bash
+        run: ./chucknorris-integration-test/script/run-integration-test.sh

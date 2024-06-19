@@ -21,98 +21,87 @@ import org.springframework.web.servlet.View;
 @RestController
 public class FeedController {
 
-  private DailyChuckService dailyChuckService;
-  private DateUtil dateUtil;
-  private EventService eventService;
-  private MailchimpService mailchimpService;
+    private DailyChuckService dailyChuckService;
+    private DateUtil dateUtil;
+    private EventService eventService;
+    private MailchimpService mailchimpService;
 
-  @Value("${mailchimp.dailychuck.list_id}")
-  private String dailyChuckListId;
+    @Value("${mailchimp.dailychuck.list_id}")
+    private String dailyChuckListId;
 
-  /** Returns a new FeedController {@link FeedController} instance. */
-  public FeedController(
-      DailyChuckService dailyChuckService,
-      DateUtil dateUtil,
-      EventService eventService,
-      MailchimpService mailchimpService) {
-    this.dailyChuckService = dailyChuckService;
-    this.dateUtil = dateUtil;
-    this.eventService = eventService;
-    this.mailchimpService = mailchimpService;
-  }
-
-  /**
-   * Returns a new DailyChuck {@link DailyChuck} instance.
-   *
-   * @return dailyChuck
-   * @throws IOException Thrown if {@link DailyChuck} can't ber persisted.
-   */
-  public @RequestMapping(
-      value = {"/feed/daily-chuck.json", "/feed/daily-chuck"},
-      method = RequestMethod.GET,
-      headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE) DailyChuck dailyChuckJson() throws IOException {
-    DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
-
-    Date now = dateUtil.now();
-    if (dailyChuck.findIssueByDate(now) instanceof DailyChuckIssue) {
-      return dailyChuck;
+    /** Returns a new FeedController {@link FeedController} instance. */
+    public FeedController(
+            DailyChuckService dailyChuckService,
+            DateUtil dateUtil,
+            EventService eventService,
+            MailchimpService mailchimpService) {
+        this.dailyChuckService = dailyChuckService;
+        this.dateUtil = dateUtil;
+        this.eventService = eventService;
+        this.mailchimpService = mailchimpService;
     }
 
-    DailyChuckIssue dailyChuckIssue =
-        dailyChuckService.composeDailyChuckIssue(dailyChuck.getIssues());
-    dailyChuck.addIssue(dailyChuckIssue);
+    /**
+     * Returns a new DailyChuck {@link DailyChuck} instance.
+     *
+     * @return dailyChuck
+     * @throws IOException Thrown if {@link DailyChuck} can't ber persisted.
+     */
+    public @RequestMapping(value = { "/feed/daily-chuck.json", "/feed/daily-chuck" }, method = RequestMethod.GET, headers = HttpHeaders.ACCEPT + "="
+            + MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE) DailyChuck dailyChuckJson() throws IOException {
+        DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
 
-    dailyChuckService.persist(dailyChuck);
+        Date now = dateUtil.now();
+        if (dailyChuck.findIssueByDate(now) instanceof DailyChuckIssue) {
+            return dailyChuck;
+        }
 
-    eventService.publishEvent(new DailyChuckPublishedEvent(dailyChuckIssue));
+        DailyChuckIssue dailyChuckIssue = dailyChuckService.composeDailyChuckIssue(dailyChuck.getIssues());
+        dailyChuck.addIssue(dailyChuckIssue);
 
-    return dailyChuck;
-  }
+        dailyChuckService.persist(dailyChuck);
 
-  /**
-   * Returns Stats about the DailyChuck.
-   *
-   * @return
-   */
-  public @RequestMapping(
-      value = "/feed/daily-chuck/stats",
-      method = RequestMethod.GET,
-      headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE) MailingListStatistic dailyChuckStats() {
-    MailingListStatistic mailingListStatistic = mailchimpService.fetchListStats(dailyChuckListId);
+        eventService.publishEvent(new DailyChuckPublishedEvent(dailyChuckIssue));
 
-    return mailingListStatistic;
-  }
-
-  /**
-   * Returns the current DailyChuck in RSS format.
-   *
-   * @return dailyChuck
-   * @throws IOException Thrown if {@link DailyChuck} can't ber persisted.
-   */
-  public @RequestMapping(
-      value = {"/feed/daily-chuck.xml", "/feed/daily-chuck"},
-      method = RequestMethod.GET,
-      headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_XML_VALUE,
-      produces = MediaType.APPLICATION_RSS_XML_VALUE) View dailyChuckRss() throws IOException {
-    DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
-
-    MailingListStatistic mailingListStatistic = mailchimpService.fetchListStats(dailyChuckListId);
-
-    Date now = dateUtil.now();
-    if (dailyChuck.findIssueByDate(now) instanceof DailyChuckIssue) {
-      return dailyChuckService.toRss(dailyChuck);
+        return dailyChuck;
     }
 
-    DailyChuckIssue dailyChuckIssue =
-        dailyChuckService.composeDailyChuckIssue(dailyChuck.getIssues());
-    dailyChuck.addIssue(dailyChuckIssue);
+    /**
+     * Returns Stats about the DailyChuck.
+     *
+     * @return
+     */
+    public @RequestMapping(value = "/feed/daily-chuck/stats", method = RequestMethod.GET, headers = HttpHeaders.ACCEPT + "="
+            + MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE) MailingListStatistic dailyChuckStats() {
+        MailingListStatistic mailingListStatistic = mailchimpService.fetchListStats(dailyChuckListId);
 
-    dailyChuckService.persist(dailyChuck);
+        return mailingListStatistic;
+    }
 
-    eventService.publishEvent(new DailyChuckPublishedEvent(dailyChuckIssue));
+    /**
+     * Returns the current DailyChuck in RSS format.
+     *
+     * @return dailyChuck
+     * @throws IOException Thrown if {@link DailyChuck} can't ber persisted.
+     */
+    public @RequestMapping(value = { "/feed/daily-chuck.xml", "/feed/daily-chuck" }, method = RequestMethod.GET, headers = HttpHeaders.ACCEPT + "="
+            + MediaType.TEXT_XML_VALUE, produces = MediaType.APPLICATION_RSS_XML_VALUE) View dailyChuckRss() throws IOException {
+        DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
 
-    return dailyChuckService.toRss(dailyChuck);
-  }
+        MailingListStatistic mailingListStatistic = mailchimpService.fetchListStats(dailyChuckListId);
+
+        Date now = dateUtil.now();
+        if (dailyChuck.findIssueByDate(now) instanceof DailyChuckIssue) {
+            return dailyChuckService.toRss(dailyChuck);
+        }
+
+        DailyChuckIssue dailyChuckIssue = dailyChuckService.composeDailyChuckIssue(dailyChuck.getIssues());
+        dailyChuck.addIssue(dailyChuckIssue);
+
+        dailyChuckService.persist(dailyChuck);
+
+        eventService.publishEvent(new DailyChuckPublishedEvent(dailyChuckIssue));
+
+        return dailyChuckService.toRss(dailyChuck);
+    }
 }

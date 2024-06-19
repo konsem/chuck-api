@@ -1,1 +1,2 @@
-public class DailyChuckRssTest {}
+public class DailyChuckRssTest {
+}

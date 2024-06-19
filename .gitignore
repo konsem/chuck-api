@@ -15,6 +15,7 @@ out/
 hs_err_pid*
 
 # Gradle
+bin/
 .gradle
 build/
 gradle-app.setting

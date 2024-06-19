@@ -3,15 +3,8 @@ plugins {
     id 'org.springframework.boot'
 }
 
-repositories {
-    mavenCentral()
-}
-
-// versions
-def lombokVersion = "1.18.30"
-
 dependencies {
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${Version.LOMBOK}"
 
     implementation "com.amazonaws:aws-java-sdk:1.11.561"
     implementation "com.fasterxml.jackson.core:jackson-core:2.17.1"
@@ -20,7 +13,7 @@ dependencies {
     implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.3.0"
     implementation "org.hibernate:hibernate-validator:6.0.16.Final"
     implementation "org.postgresql:postgresql:42.2.9"
-    implementation "org.projectlombok:lombok:${lombokVersion}"
+    implementation "org.projectlombok:lombok:${Version.LOMBOK}"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
     implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
     implementation "org.springframework.boot:spring-boot-starter-web"
@@ -35,7 +28,6 @@ tasks {
         manifest.attributes("Multi-Release": "true")
 
         archiveBaseName.set(project.name)
-        archiveVersion.set(project.version)
 
         if (project.hasProperty("archiveName")) {
             archiveFileName.set(project.properties["archiveName"] as String)
@@ -45,25 +37,12 @@ tasks {
     docker {
         dependsOn bootJar
 
-        def imageName = "${project.properties.group}/${project.name}"
-        name = "${imageName}:latest"
+        name = "${project.properties.group}/${project.name}"
 
-        tag("current", "${imageName}:${project.version}")
-        tag("latest", "${imageName}:latest")
         tag("herokuProduction", "registry.heroku.com/chucky/web")
 
         dockerfile file("${projectDir}/src/main/docker/Dockerfile")
         files tasks.bootJar.outputs
-        buildArgs([JAR_FILE: bootJar.getArchiveFileName().get()])
-    }
-
-    springBoot {
-        buildInfo {
-            properties {
-                artifact = "${project.name}-${project.version}.jar"
-                version = project.version
-                name = project.name
-            }
-        }
+        buildArgs([JAR_FILE: bootJar.getArchiveFileName().get()] as Map<String, String>)
     }
 }

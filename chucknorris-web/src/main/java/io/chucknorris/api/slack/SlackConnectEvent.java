@@ -4,7 +4,7 @@ import io.chucknorris.lib.event.BaseEvent;
 
 public class SlackConnectEvent extends BaseEvent {
 
-  public SlackConnectEvent(AccessToken accessToken) {
-    super("SlackConnectEvent", accessToken);
-  }
+    public SlackConnectEvent(AccessToken accessToken) {
+        super("SlackConnectEvent", accessToken);
+    }
 }

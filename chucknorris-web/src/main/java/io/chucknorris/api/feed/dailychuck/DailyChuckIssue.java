@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class DailyChuckIssue {
 
-  private Date date;
-  private String jokeId;
+    private Date date;
+    private String jokeId;
 }

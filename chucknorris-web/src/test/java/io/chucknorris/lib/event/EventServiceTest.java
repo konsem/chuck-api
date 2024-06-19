@@ -8,8 +8,10 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class EventServiceTest {
 
-  @InjectMocks private EventService eventService;
+    @InjectMocks
+    private EventService eventService;
 
-  @Test
-  public void testPublish() {}
+    @Test
+    public void testPublish() {
+    }
 }

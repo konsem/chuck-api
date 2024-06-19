@@ -20,97 +20,96 @@ import org.springframework.stereotype.Service;
 @Service
 public class DailyChuckService {
 
-  private AmazonS3 amazonS3;
-  private JokeRepository jokeRepository;
+    private AmazonS3 amazonS3;
+    private JokeRepository jokeRepository;
 
-  @Value("${dailychuck.bucket_name}")
-  private String bucketName;
+    @Value("${dailychuck.bucket_name}")
+    private String bucketName;
 
-  @Value("${application.base_url}")
-  private String baseUrl;
+    @Value("${application.base_url}")
+    private String baseUrl;
 
-  @Value("${dailychuck.key_name}")
-  private String keyName;
+    @Value("${dailychuck.key_name}")
+    private String keyName;
 
-  /**
-   * Instantiates a new Daily chuck service.
-   *
-   * @param amazonS3 the amazon s 3
-   * @param jokeRepository the joke repository
-   */
-  public DailyChuckService(AmazonS3 amazonS3, JokeRepository jokeRepository) {
-    this.amazonS3 = amazonS3;
-    this.jokeRepository = jokeRepository;
-  }
-
-  /**
-   * Composes a daily chuck issue {@link DailyChuck}.
-   *
-   * @param excludedIssues Array of issues to be excluded
-   * @return dailyChuckIssue
-   */
-  public DailyChuckIssue composeDailyChuckIssue(DailyChuckIssue[] excludedIssues) {
-    Joke joke = jokeRepository.getRandomJoke();
-
-    Boolean isIncluded = false;
-    for (DailyChuckIssue dailyChuckIssue : excludedIssues) {
-      if (dailyChuckIssue.getJokeId().equals(joke.getId())) {
-        isIncluded = true;
-        break;
-      }
+    /**
+     * Instantiates a new Daily chuck service.
+     *
+     * @param amazonS3 the amazon s 3
+     * @param jokeRepository the joke repository
+     */
+    public DailyChuckService(AmazonS3 amazonS3, JokeRepository jokeRepository) {
+        this.amazonS3 = amazonS3;
+        this.jokeRepository = jokeRepository;
     }
 
-    if (!isIncluded) {
-      DailyChuckIssue dailyChuckIssue = new DailyChuckIssue();
-      dailyChuckIssue.setDate(new Date());
-      dailyChuckIssue.setJokeId(joke.getId());
+    /**
+     * Composes a daily chuck issue {@link DailyChuck}.
+     *
+     * @param excludedIssues Array of issues to be excluded
+     * @return dailyChuckIssue
+     */
+    public DailyChuckIssue composeDailyChuckIssue(DailyChuckIssue[] excludedIssues) {
+        Joke joke = jokeRepository.getRandomJoke();
 
-      return dailyChuckIssue;
-    } else {
-      return composeDailyChuckIssue(excludedIssues);
+        Boolean isIncluded = false;
+        for (DailyChuckIssue dailyChuckIssue : excludedIssues) {
+            if (dailyChuckIssue.getJokeId().equals(joke.getId())) {
+                isIncluded = true;
+                break;
+            }
+        }
+
+        if (!isIncluded) {
+            DailyChuckIssue dailyChuckIssue = new DailyChuckIssue();
+            dailyChuckIssue.setDate(new Date());
+            dailyChuckIssue.setJokeId(joke.getId());
+
+            return dailyChuckIssue;
+        } else {
+            return composeDailyChuckIssue(excludedIssues);
+        }
     }
-  }
 
-  /**
-   * Gets the current daily chuck issue {@link DailyChuck}.
-   *
-   * @return dailyChuck
-   * @throws IOException Thrown by {@link ObjectMapper#readValue}
-   */
-  public DailyChuck getDailyChuck() throws IOException {
-    GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, keyName);
-    S3Object object = amazonS3.getObject(getObjectRequest);
+    /**
+     * Gets the current daily chuck issue {@link DailyChuck}.
+     *
+     * @return dailyChuck
+     * @throws IOException Thrown by {@link ObjectMapper#readValue}
+     */
+    public DailyChuck getDailyChuck() throws IOException {
+        GetObjectRequest getObjectRequest = new GetObjectRequest(bucketName, keyName);
+        S3Object object = amazonS3.getObject(getObjectRequest);
 
-    ObjectMapper mapper = new ObjectMapper();
-    DailyChuck dailyChuck = mapper.readValue(object.getObjectContent(), DailyChuck.class);
+        ObjectMapper mapper = new ObjectMapper();
+        DailyChuck dailyChuck = mapper.readValue(object.getObjectContent(), DailyChuck.class);
 
-    return dailyChuck;
-  }
+        return dailyChuck;
+    }
 
-  /**
-   * Persists daily chuck {@link DailyChuck} and returns the S3 result {@link PutObjectResult}.
-   *
-   * @return putObjectResult
-   * @throws IOException Thrown by {@link ObjectMapper#writeValueAsString}
-   */
-  public PutObjectResult persist(DailyChuck dailyChuck) throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
+    /**
+     * Persists daily chuck {@link DailyChuck} and returns the S3 result {@link PutObjectResult}.
+     *
+     * @return putObjectResult
+     * @throws IOException Thrown by {@link ObjectMapper#writeValueAsString}
+     */
+    public PutObjectResult persist(DailyChuck dailyChuck) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
 
-    String fileContentString = mapper.writeValueAsString(dailyChuck);
-    byte[] fileContentBytes = fileContentString.getBytes(StandardCharsets.UTF_8);
+        String fileContentString = mapper.writeValueAsString(dailyChuck);
+        byte[] fileContentBytes = fileContentString.getBytes(StandardCharsets.UTF_8);
 
-    ObjectMetadata metadata = new ObjectMetadata();
-    metadata.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    metadata.setContentLength(fileContentBytes.length);
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        metadata.setContentLength(fileContentBytes.length);
 
-    PutObjectRequest request =
-        new PutObjectRequest(
-            bucketName, keyName, new ByteArrayInputStream(fileContentBytes), metadata);
+        PutObjectRequest request = new PutObjectRequest(
+                bucketName, keyName, new ByteArrayInputStream(fileContentBytes), metadata);
 
-    return amazonS3.putObject(request);
-  }
+        return amazonS3.putObject(request);
+    }
 
-  public DailyChuckRss toRss(DailyChuck dailyChuck) {
-    return new DailyChuckRss(baseUrl, dailyChuck, jokeRepository);
-  }
+    public DailyChuckRss toRss(DailyChuck dailyChuck) {
+        return new DailyChuckRss(baseUrl, dailyChuck, jokeRepository);
+    }
 }
