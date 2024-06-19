@@ -1,4 +1,4 @@
-# CHUCKNORRIS.IO [![CircleCI](https://circleci.com/gh/chucknorris-io/chuck-api.svg?style=svg)](https://circleci.com/gh/chucknorris-io/chuck-api)
+# CHUCKNORRIS.IO
 
 [chucknorris.io](https://api.chucknorris.io) is a free JSON API for hand curated Chuck Norris facts.
 
