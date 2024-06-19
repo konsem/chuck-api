@@ -14,7 +14,7 @@ env:
   JAVA_VERSION: 21
 
 jobs:
-  deploy:
+  deploy-web:
     runs-on: [ ubuntu-latest ]
     steps:
       - name: Checkout code
@@ -37,7 +37,7 @@ jobs:
           username: _
 
       - name: Push image to Heroku registry
-        run: ./gradlew dockerPushHerokuProduction
+        run: ./gradlew :chucknorris-web:dockerPushHerokuProduction
 
       - name: Trigger release
         shell: bash

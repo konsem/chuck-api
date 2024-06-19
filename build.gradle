@@ -1,98 +1,45 @@
-plugins {
-	id 'com.diffplug.spotless' version '7.0.0.BETA1'
-	id 'com.palantir.docker' version '0.36.0'
-	id 'io.spring.dependency-management' version '1.1.5'
-	id 'java'
-	id 'org.springframework.boot' version '2.7.18'
+import org.gradle.api.tasks.testing.logging.TestLogEvent
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.diffplug.spotless:spotless-plugin-gradle:${Version.SPOTLESS}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${Version.SPRING_BOOT}")
+    }
 }
 
-def gitRev = { ->
-	def stdout = new ByteArrayOutputStream()
+version = Git.commitHash()
 
-	exec {
-		commandLine 'git', 'rev-parse', 'HEAD'
-		standardOutput = stdout
-	}
+subprojects { Project project ->
+    apply plugin: 'com.diffplug.spotless'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java'
 
-	return stdout.toString().trim()
-}
+    sourceCompatibility = 17
+    targetCompatibility = 17
+    version Git.commitHash()
 
-String appName = "api"
-String appVer = gitRev()
+    dependencyManagement {
+        imports { mavenBom("org.springframework.boot:spring-boot-dependencies:${Version.SPRING_BOOT}") }
+    }
 
-group = "io.chucknorris"
-version = appVer
-java.sourceCompatibility = JavaVersion.VERSION_17
+    repositories {
+        mavenCentral()
+    }
 
-repositories {
-	mavenCentral()
-}
+    tasks.withType(Test) {
+        useJUnitPlatform()
 
-// versions
-def lombokVersion = "1.18.30"
+        testLogging {
+            events TestLogEvent.FAILED, TestLogEvent.PASSED, TestLogEvent.SKIPPED
+        }
+    }
 
-dependencies {
-	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
-	implementation "com.amazonaws:aws-java-sdk:1.11.561"
-	implementation "com.fasterxml.jackson.core:jackson-core:2.17.1"
-	implementation "com.rometools:rome:1.12.0"
-	implementation "com.vladmihalcea:hibernate-types-52:2.4.0"
-	implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.3.0"
-	implementation "org.hibernate:hibernate-validator:6.0.16.Final"
-	implementation "org.postgresql:postgresql:42.2.9"
-	implementation "org.projectlombok:lombok:${lombokVersion}"
-	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-	implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
-	implementation "org.springframework.boot:spring-boot-starter-web"
-	implementation 'com.google.guava:guava:33.2.1-jre'
-
-	testImplementation "org.springframework.boot:spring-boot-starter-test"
-	testImplementation 'junit:junit:4.12'
-}
-
-tasks {
-	bootJar {
-		manifest.attributes(
-				'Multi-Release': 'true'
-		)
-
-		archiveBaseName.set(appName)
-		archiveVersion.set(appVer)
-
-		if (project.hasProperty("archiveName")) {
-			archiveFileName.set(project.properties["archiveName"] as String)
-		}
-	}
-
-	docker {
-		dependsOn bootJar
-
-		def imageName = "${project.properties.group}/${appName}"
-		name = "${imageName}:latest"
-
-		tag("current", "${imageName}:${appVer}")
-		tag("latest", "${imageName}:latest")
-		tag("herokuProduction", "registry.heroku.com/chucky/web")
-
-		dockerfile file("${projectDir}/src/main/docker/Dockerfile")
-		files tasks.bootJar.outputs
-		buildArgs([JAR_FILE: bootJar.getArchiveFileName().get()])
-	}
-
-	springBoot {
-		buildInfo {
-			properties {
-				artifact = "${appName}-${appVer}.jar"
-				version = appVer
-				name = appName
-			}
-		}
-	}
-
-	spotless {
-		java {
-			googleJavaFormat()
-		}
-	}
+    spotless {
+        java {
+            googleJavaFormat()
+        }
+    }
 }
