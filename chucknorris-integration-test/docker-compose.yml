@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  database:
+    image: chucknorrisio/postgres
+    container_name: chucknorris-database
+    healthcheck:
+      interval: 30s
+      retries: 5
+      start_period: 80s
+      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
+      timeout: 60s
+    ports:
+      - '5432:5432'
+
+  service:
+    environment:
+      - APPLICATION_EVENT_SNS_TOPIC_ARN=my-application-event-sns-topic-arn
+      - AWS_ACCESS_KEY_ID=my-aws-access-key-id
+      - AWS_ACCESS_KEY_SECRET=my-aws-access-key-secret
+      - AWS_REGION=my-aws-region
+      - DAILYCHUCK_BUCKET_NAME=my-dailychuck-bucket-name
+      - DAILYCHUCK_KEY_NAME=my-dailychuck-key-name
+      - DATABASE_URL=postgres://postgres:postgres@database:5432/chuck
+      - MAILCHIMP_API_KEY=my-mailchimp-api-key
+      - MAILCHIMP_DAILYCHUCK_LIST_ID=my-mailchimp-dailychuck-list-id
+      - SLACK_CONTENT_WHITELISTED_CATEGORIES=career,dev,fashion,food,money,movie,travel
+      - SLACK_OAUTH_ACCESS_TOKEN=xxxx-xxxxxxxxxxx-xxxxxxxxxxx-xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      - SLACK_OAUTH_CLIENT_ID=xxxxxxxxxxx.xxxxxxxxxxxx
+      - SLACK_OAUTH_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      - SLACK_OAUTH_REDIRECT_URI=https://api.chucknorris.io/connect/slack
+    image: chucknorris/chucknorris-web
+    container_name: chucknorris-web
+    depends_on:
+      database:
+        condition: service_healthy
+    ports:
+      - '8080:8080'

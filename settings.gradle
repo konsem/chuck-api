@@ -9,4 +9,5 @@
 
 rootProject.name = 'chucknorris'
 
+include("chucknorris-integration-test")
 include("chucknorris-web")

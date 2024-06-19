@@ -1,8 +1,0 @@
-version: '3.3'
-
-services:
-  postgres:
-    image: chucknorrisio/postgres
-    container_name: chucknorris-postgres
-    ports:
-      - '5432:5432'
