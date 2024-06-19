@@ -11,7 +11,7 @@ public class CommandResponseAttachment implements Serializable, SlackCommandResp
   private String fallback;
 
   @JsonProperty("mrkdwn_in")
-  private String[] mrkdownIn = new String[]{"text"};
+  private String[] mrkdownIn = new String[] {"text"};
 
   @JsonProperty("text")
   private String text;

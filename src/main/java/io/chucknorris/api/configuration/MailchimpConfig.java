@@ -11,13 +11,9 @@ public class MailchimpConfig {
   @Value("${mailchimp.api_key}")
   private String apiKey;
 
-  /**
-   * Returns a new {@link MailchimpService} instance.
-   */
+  /** Returns a new {@link MailchimpService} instance. */
   public @Bean MailchimpService mailchimpService() {
-    String dataCenter = apiKey.substring(
-        apiKey.length() - 4
-    );
+    String dataCenter = apiKey.substring(apiKey.length() - 4);
     String baseUrl = "https://" + dataCenter + ".api.mailchimp.com";
 
     return new MailchimpService(apiKey, baseUrl);

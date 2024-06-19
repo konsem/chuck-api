@@ -29,9 +29,7 @@ public class Request implements Serializable {
   @JsonProperty("enterprise_name")
   private String enterpriseName;
 
-  /**
-   * A URL that you can use to respond to the command.
-   */
+  /** A URL that you can use to respond to the command. */
   @JsonProperty("enterprise_url")
   private String responseUrl;
 
@@ -64,9 +62,7 @@ public class Request implements Serializable {
   @JsonProperty("trigger_id")
   private String triggerId;
 
-  /**
-   * The ID of the user who triggered the command.
-   */
+  /** The ID of the user who triggered the command. */
   @JsonProperty("user_id")
   private String userId;
 
@@ -77,4 +73,3 @@ public class Request implements Serializable {
   @JsonProperty("user_name")
   private String userName;
 }
-

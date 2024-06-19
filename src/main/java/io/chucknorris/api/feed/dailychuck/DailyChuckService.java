@@ -103,12 +103,9 @@ public class DailyChuckService {
     metadata.setContentType(MediaType.APPLICATION_JSON_VALUE);
     metadata.setContentLength(fileContentBytes.length);
 
-    PutObjectRequest request = new PutObjectRequest(
-        bucketName,
-        keyName,
-        new ByteArrayInputStream(fileContentBytes),
-        metadata
-    );
+    PutObjectRequest request =
+        new PutObjectRequest(
+            bucketName, keyName, new ByteArrayInputStream(fileContentBytes), metadata);
 
     return amazonS3.putObject(request);
   }

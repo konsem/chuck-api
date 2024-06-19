@@ -18,14 +18,14 @@ public class Help implements SlackCommandResponse {
   @JsonProperty("text")
   private String text = "*Available commands:*";
 
-  /**
-   * Instantiates a new Help {@link Help}.
-   */
+  /** Instantiates a new Help {@link Help}. */
   public Help() {
     CommandResponseAttachment newsletter = new CommandResponseAttachment();
     newsletter.setTitle("The Daily Chuck");
     newsletter.setText(
-        ":facepunch: Sign up for *The Daily Chuck* and get your daily dose of the best #ChuckNorrisFacts every morning straight int your inbox! https://mailchi.mp/5a19a2898bf7/the-daily-chuck");
+        ":facepunch: Sign up for *The Daily Chuck* and get your daily dose of the best"
+            + " #ChuckNorrisFacts every morning straight int your inbox!"
+            + " https://mailchi.mp/5a19a2898bf7/the-daily-chuck");
 
     CommandResponseAttachment randomJoke = new CommandResponseAttachment();
     randomJoke.setText("Type `/chuck` to get a random joke.");
@@ -33,12 +33,13 @@ public class Help implements SlackCommandResponse {
 
     CommandResponseAttachment search = new CommandResponseAttachment();
     search.setText(
-        "Type `/chuck ? {search_term}` to search within tens of thousands Chuck Norris jokes.");
+        "Type `/chuck ? {search_term}` to search within tens of thousands Chuck Norris"
+            + " jokes.");
     search.setTitle("Free text search");
 
     CommandResponseAttachment randomJokePersonalized = new CommandResponseAttachment();
-    randomJokePersonalized
-        .setText("Type `/chuck @ {user_name}` to get a random personalized joke.");
+    randomJokePersonalized.setText(
+        "Type `/chuck @ {user_name}` to get a random personalized joke.");
     randomJokePersonalized.setTitle("Random personalized joke");
 
     CommandResponseAttachment randomJokeFromCategory = new CommandResponseAttachment();
@@ -58,15 +59,16 @@ public class Help implements SlackCommandResponse {
     help.setText("Type `/chuck help` to display a list of available commands.");
     help.setTitle("Help");
 
-    attachments = new CommandResponseAttachment[]{
-        newsletter,
-        randomJoke,
-        search,
-        randomJokePersonalized,
-        randomJokeFromCategory,
-        categories,
-        jokeById,
-        help
-    };
+    attachments =
+        new CommandResponseAttachment[] {
+          newsletter,
+          randomJoke,
+          search,
+          randomJokePersonalized,
+          randomJokeFromCategory,
+          categories,
+          jokeById,
+          help
+        };
   }
 }

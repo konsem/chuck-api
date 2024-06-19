@@ -13,8 +13,7 @@ public class MailchimpService {
   private String apiKey;
   private String baseUrl;
 
-  @Autowired
-  private RestTemplate restTemplate;
+  @Autowired private RestTemplate restTemplate;
 
   public MailchimpService(String apiKey, String baseUrl) {
     this.apiKey = apiKey;
@@ -37,12 +36,12 @@ public class MailchimpService {
     headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE);
     headers.add(HttpHeaders.AUTHORIZATION, "apikey " + this.apiKey);
 
-    ResponseEntity<MailingList> responseEntity = restTemplate.exchange(
-        baseUrl + "/3.0/lists/" + listId,
-        HttpMethod.GET,
-        new HttpEntity<>(null, headers),
-        MailingList.class
-    );
+    ResponseEntity<MailingList> responseEntity =
+        restTemplate.exchange(
+            baseUrl + "/3.0/lists/" + listId,
+            HttpMethod.GET,
+            new HttpEntity<>(null, headers),
+            MailingList.class);
 
     return responseEntity.getBody();
   }

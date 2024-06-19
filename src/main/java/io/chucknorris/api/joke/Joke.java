@@ -23,9 +23,7 @@ import org.hibernate.annotations.TypeDefs;
 @JsonSerialize(using = JokeSerializer.class)
 @NoArgsConstructor
 @Table(name = "joke")
-@TypeDefs({
-    @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-})
+@TypeDefs({@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)})
 public class Joke implements Serializable {
 
   @Column(name = "categories", columnDefinition = "jsonb")
@@ -36,7 +34,7 @@ public class Joke implements Serializable {
   private String createdAt;
 
   @Transient
-  final private String iconUrl = "https://assets.chucknorris.host/img/avatar/chuck-norris.png";
+  private final String iconUrl = "https://assets.chucknorris.host/img/avatar/chuck-norris.png";
 
   @Id
   @Column(name = "joke_id", updatable = false, nullable = false)
@@ -45,8 +43,7 @@ public class Joke implements Serializable {
   @Column(name = "updated_at")
   private String updatedAt;
 
-  @Transient
-  private String url;
+  @Transient private String url;
 
   @Column(name = "value")
   private String value;

@@ -1,19 +1,20 @@
 plugins {
-    id 'com.palantir.docker' version '0.36.0'
-    id 'io.spring.dependency-management' version '1.1.5'
-    id 'java'
-    id 'org.springframework.boot' version '2.7.18'
+	id 'com.diffplug.spotless' version '7.0.0.BETA1'
+	id 'com.palantir.docker' version '0.36.0'
+	id 'io.spring.dependency-management' version '1.1.5'
+	id 'java'
+	id 'org.springframework.boot' version '2.7.18'
 }
 
 def gitRev = { ->
-    def stdout = new ByteArrayOutputStream()
+	def stdout = new ByteArrayOutputStream()
 
-    exec {
-        commandLine 'git', 'rev-parse', 'HEAD'
-        standardOutput = stdout
-    }
+	exec {
+		commandLine 'git', 'rev-parse', 'HEAD'
+		standardOutput = stdout
+	}
 
-    return stdout.toString().trim()
+	return stdout.toString().trim()
 }
 
 String appName = "api"
@@ -24,68 +25,74 @@ version = appVer
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
-    mavenCentral()
+	mavenCentral()
 }
 
 // versions
 def lombokVersion = "1.18.30"
 
 dependencies {
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
 
-    implementation "com.amazonaws:aws-java-sdk:1.11.561"
-    implementation "com.fasterxml.jackson.core:jackson-core:2.17.1"
-    implementation "com.rometools:rome:1.12.0"
-    implementation "com.vladmihalcea:hibernate-types-52:2.4.0"
-    implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.3.0"
-    implementation "org.hibernate:hibernate-validator:6.0.16.Final"
-    implementation "org.postgresql:postgresql:42.2.9"
-    implementation "org.projectlombok:lombok:${lombokVersion}"
-    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-    implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
-    implementation "org.springframework.boot:spring-boot-starter-web"
-    implementation 'com.google.guava:guava:33.2.1-jre'
+	implementation "com.amazonaws:aws-java-sdk:1.11.561"
+	implementation "com.fasterxml.jackson.core:jackson-core:2.17.1"
+	implementation "com.rometools:rome:1.12.0"
+	implementation "com.vladmihalcea:hibernate-types-52:2.4.0"
+	implementation "nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:2.3.0"
+	implementation "org.hibernate:hibernate-validator:6.0.16.Final"
+	implementation "org.postgresql:postgresql:42.2.9"
+	implementation "org.projectlombok:lombok:${lombokVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+	implementation "org.springframework.boot:spring-boot-starter-thymeleaf"
+	implementation "org.springframework.boot:spring-boot-starter-web"
+	implementation 'com.google.guava:guava:33.2.1-jre'
 
-    testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation 'junit:junit:4.12'
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+	testImplementation 'junit:junit:4.12'
 }
 
 tasks {
-    bootJar {
-        manifest.attributes(
-                'Multi-Release': 'true'
-        )
+	bootJar {
+		manifest.attributes(
+				'Multi-Release': 'true'
+		)
 
-        archiveBaseName.set(appName)
-        archiveVersion.set(appVer)
+		archiveBaseName.set(appName)
+		archiveVersion.set(appVer)
 
-        if (project.hasProperty("archiveName")) {
-            archiveFileName.set(project.properties["archiveName"] as String)
-        }
-    }
+		if (project.hasProperty("archiveName")) {
+			archiveFileName.set(project.properties["archiveName"] as String)
+		}
+	}
 
-    docker {
-        dependsOn bootJar
+	docker {
+		dependsOn bootJar
 
-        def imageName = "${project.properties.group}/${appName}"
-        name = "${imageName}:latest"
+		def imageName = "${project.properties.group}/${appName}"
+		name = "${imageName}:latest"
 
-        tag("current", "${imageName}:${appVer}")
-        tag("latest", "${imageName}:latest")
-        tag("herokuProduction", "registry.heroku.com/chucky/web")
+		tag("current", "${imageName}:${appVer}")
+		tag("latest", "${imageName}:latest")
+		tag("herokuProduction", "registry.heroku.com/chucky/web")
 
-        dockerfile file("${projectDir}/src/main/docker/Dockerfile")
-        files tasks.bootJar.outputs
-        buildArgs([JAR_FILE: bootJar.getArchiveFileName().get()])
-    }
+		dockerfile file("${projectDir}/src/main/docker/Dockerfile")
+		files tasks.bootJar.outputs
+		buildArgs([JAR_FILE: bootJar.getArchiveFileName().get()])
+	}
 
-    springBoot {
-        buildInfo {
-            properties {
-                artifact = "${appName}-${appVer}.jar"
-                version = appVer
-                name = appName
-            }
-        }
-    }
+	springBoot {
+		buildInfo {
+			properties {
+				artifact = "${appName}-${appVer}.jar"
+				version = appVer
+				name = appName
+			}
+		}
+	}
+
+	spotless {
+		java {
+			googleJavaFormat()
+		}
+	}
 }

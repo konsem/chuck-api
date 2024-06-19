@@ -29,15 +29,12 @@ public class FeedController {
   @Value("${mailchimp.dailychuck.list_id}")
   private String dailyChuckListId;
 
-  /**
-   * Returns a new FeedController {@link FeedController} instance.
-   */
+  /** Returns a new FeedController {@link FeedController} instance. */
   public FeedController(
       DailyChuckService dailyChuckService,
       DateUtil dateUtil,
       EventService eventService,
-      MailchimpService mailchimpService
-  ) {
+      MailchimpService mailchimpService) {
     this.dailyChuckService = dailyChuckService;
     this.dateUtil = dateUtil;
     this.eventService = eventService;
@@ -54,8 +51,7 @@ public class FeedController {
       value = {"/feed/daily-chuck.json", "/feed/daily-chuck"},
       method = RequestMethod.GET,
       headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE
-  ) DailyChuck dailyChuckJson() throws IOException {
+      produces = MediaType.APPLICATION_JSON_VALUE) DailyChuck dailyChuckJson() throws IOException {
     DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
 
     Date now = dateUtil.now();
@@ -63,8 +59,8 @@ public class FeedController {
       return dailyChuck;
     }
 
-    DailyChuckIssue dailyChuckIssue = dailyChuckService
-        .composeDailyChuckIssue(dailyChuck.getIssues());
+    DailyChuckIssue dailyChuckIssue =
+        dailyChuckService.composeDailyChuckIssue(dailyChuck.getIssues());
     dailyChuck.addIssue(dailyChuckIssue);
 
     dailyChuckService.persist(dailyChuck);
@@ -83,8 +79,7 @@ public class FeedController {
       value = "/feed/daily-chuck/stats",
       method = RequestMethod.GET,
       headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
-      produces = MediaType.APPLICATION_JSON_VALUE
-  ) MailingListStatistic dailyChuckStats() {
+      produces = MediaType.APPLICATION_JSON_VALUE) MailingListStatistic dailyChuckStats() {
     MailingListStatistic mailingListStatistic = mailchimpService.fetchListStats(dailyChuckListId);
 
     return mailingListStatistic;
@@ -100,8 +95,7 @@ public class FeedController {
       value = {"/feed/daily-chuck.xml", "/feed/daily-chuck"},
       method = RequestMethod.GET,
       headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_XML_VALUE,
-      produces = MediaType.APPLICATION_RSS_XML_VALUE
-  ) View dailyChuckRss() throws IOException {
+      produces = MediaType.APPLICATION_RSS_XML_VALUE) View dailyChuckRss() throws IOException {
     DailyChuck dailyChuck = dailyChuckService.getDailyChuck();
 
     MailingListStatistic mailingListStatistic = mailchimpService.fetchListStats(dailyChuckListId);
@@ -111,8 +105,8 @@ public class FeedController {
       return dailyChuckService.toRss(dailyChuck);
     }
 
-    DailyChuckIssue dailyChuckIssue = dailyChuckService
-        .composeDailyChuckIssue(dailyChuck.getIssues());
+    DailyChuckIssue dailyChuckIssue =
+        dailyChuckService.composeDailyChuckIssue(dailyChuck.getIssues());
     dailyChuck.addIssue(dailyChuckIssue);
 
     dailyChuckService.persist(dailyChuck);

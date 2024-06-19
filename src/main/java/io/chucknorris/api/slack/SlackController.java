@@ -42,39 +42,33 @@ public class SlackController {
   private JokeService jokeService;
   private SlackService slackService;
 
-  /**
-   * Returns a new {@link SlackController} instance.
-   */
+  /** Returns a new {@link SlackController} instance. */
   public SlackController(
       EventService eventService,
       JokeRepository jokeRepository,
       JokeService jokeService,
-      SlackService slackService
-  ) {
+      SlackService slackService) {
     this.eventService = eventService;
     this.jokeRepository = jokeRepository;
     this.jokeService = jokeService;
     this.slackService = slackService;
   }
 
-  /**
-   * Returns the model for the connect/slack view.
-   */
+  /** Returns the model for the connect/slack view. */
   public @RequestMapping(
       value = "/connect/slack",
       method = RequestMethod.GET,
       headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_HTML_VALUE,
-      produces = MediaType.TEXT_HTML_VALUE
-  ) ModelAndView connect(
-      @RequestParam(value = "code", required = false) final String code
-  ) throws JsonProcessingException {
+      produces = MediaType.TEXT_HTML_VALUE) ModelAndView connect(
+      @RequestParam(value = "code", required = false) final String code)
+      throws JsonProcessingException {
     AccessToken accessToken = slackService.requestAccessToken(code);
 
     ModelAndView model = new ModelAndView("connect/slack");
     if (accessToken.getAccessToken() != null) {
       model.setStatus(HttpStatus.OK);
-      model.addObject("page_title",
-          "Congrats, the app was successfully installed for your Slack team!");
+      model.addObject(
+          "page_title", "Congrats, the app was successfully installed for your Slack team!");
       model.addObject("error", false);
       model.addObject("message", null);
 
@@ -101,11 +95,10 @@ public class SlackController {
       value = {"/integration/slack", "/jokes/slack"},
       method = RequestMethod.POST,
       headers = {
-          HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
-          HttpHeaders.CONTENT_TYPE + "=" + MediaType.APPLICATION_FORM_URLENCODED_VALUE
+        HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE,
+        HttpHeaders.CONTENT_TYPE + "=" + MediaType.APPLICATION_FORM_URLENCODED_VALUE
       },
-      produces = MediaType.APPLICATION_JSON_VALUE
-  ) SlackCommandResponse command(Request request) {
+      produces = MediaType.APPLICATION_JSON_VALUE) SlackCommandResponse command(Request request) {
     logger.info(request.toString());
 
     if (request.getText() == null || request.getText().isEmpty()) {
@@ -115,9 +108,7 @@ public class SlackController {
       urlQueryParams.set("utm_term", request.getTeamDomain());
       urlQueryParams.set("utm_campaign", "random+joke");
 
-      Joke joke = jokeService.randomJokeByCategories(
-          slackService.getWhitelistedCategories()
-      );
+      Joke joke = jokeService.randomJokeByCategories(slackService.getWhitelistedCategories());
 
       return composeJokeResponse(joke, urlQueryParams);
     }
@@ -135,8 +126,7 @@ public class SlackController {
       stringBuilder.append(String.join("`, `", whitelistedCategories));
       stringBuilder.append(
           "`. Type `/chuck {category_name}` to retrieve a "
-              + "random joke from within the given category."
-      );
+              + "random joke from within the given category.");
 
       CommandResponse response = new CommandResponse();
       response.setText(stringBuilder.toString());
@@ -177,17 +167,16 @@ public class SlackController {
       String[] whitelistedCategories = slackService.filterNonWhitelistedCategories(categories);
 
       String substitute = request.getText().substring(1).trim();
-      Joke joke = jokeService.randomPersonalizedJokeByCategories(
-          substitute,
-          whitelistedCategories
-      );
+      Joke joke = jokeService.randomPersonalizedJokeByCategories(substitute, whitelistedCategories);
 
       if (joke == null) {
         CommandResponse response = new CommandResponse();
-        response.setText("Your search for *\"" + substitute
-            + "\"* did not match any joke ¯\\_(ツ)_/¯. Make sure that all words are spelled "
-            + "correctly. Try different keywords. Try more general keywords."
-        );
+        response.setText(
+            "Your search for *\""
+                + substitute
+                + "\"* did not match any joke ¯\\_(ツ)_/¯. Make sure that all words"
+                + " are spelled correctly. Try different keywords. Try more general"
+                + " keywords.");
         response.setResponseType(ResponseType.EPHEMERAL);
         return response;
       }
@@ -215,18 +204,17 @@ public class SlackController {
 
       String[] categories = jokeRepository.findAllCategories();
       String[] whitelistedCategories = slackService.filterNonWhitelistedCategories(categories);
-      Page<Joke> jokes = jokeService.searchWithCategoryFilter(
-          query,
-          whitelistedCategories,
-          pageable
-      );
+      Page<Joke> jokes =
+          jokeService.searchWithCategoryFilter(query, whitelistedCategories, pageable);
 
       if (jokes.getContent().size() < 1) {
         CommandResponse response = new CommandResponse();
-        response.setText("Your search for *\"" + query
-            + "\"* did not match any joke ¯\\_(ツ)_/¯. Make sure that all words are spelled "
-            + "correctly. Try different keywords. Try more general keywords."
-        );
+        response.setText(
+            "Your search for *\""
+                + query
+                + "\"* did not match any joke ¯\\_(ツ)_/¯. Make sure that all words"
+                + " are spelled correctly. Try different keywords. Try more general"
+                + " keywords.");
         response.setResponseType(ResponseType.EPHEMERAL);
 
         return response;
@@ -238,20 +226,19 @@ public class SlackController {
       urlQueryParams.set("utm_term", request.getTeamDomain());
       urlQueryParams.set("utm_campaign", "search+joke");
 
-      SlackCommandResponseAttachment[] attachments = new CommandResponseAttachment[
-          jokes.getContent().size()
-          ];
+      SlackCommandResponseAttachment[] attachments =
+          new CommandResponseAttachment[jokes.getContent().size()];
       for (int i = 0; i < jokes.getContent().size(); i++) {
         Joke joke = jokes.getContent().get(i);
 
-        UriComponents uriComponents = UriComponentsBuilder
-            .newInstance()
-            .scheme("https")
-            .host(baseUrl)
-            .path("/jokes/" + joke.getId())
-            .queryParams(urlQueryParams)
-            .build()
-            .encode();
+        UriComponents uriComponents =
+            UriComponentsBuilder.newInstance()
+                .scheme("https")
+                .host(baseUrl)
+                .path("/jokes/" + joke.getId())
+                .queryParams(urlQueryParams)
+                .build()
+                .encode();
 
         SlackCommandResponseAttachment attachment = new CommandResponseAttachment();
         attachment.setFallback(joke.getValue());
@@ -264,23 +251,28 @@ public class SlackController {
 
       CommandResponse response = new CommandResponse();
       if (!jokes.isLast()) {
-        response.setText("*Search results: "
-            + (page * itemsPerPage + 1)
-            + " - "
-            + (page * itemsPerPage + jokes.getContent().size())
-            + " of " + jokes.getTotalElements()
-            + "*. "
-            + "Type `/chuck ? "
-            + query
-            + " --page "
-            + (page + 1 + 1)
-            + "` to see more results."
-        );
+        response.setText(
+            "*Search results: "
+                + (page * itemsPerPage + 1)
+                + " - "
+                + (page * itemsPerPage + jokes.getContent().size())
+                + " of "
+                + jokes.getTotalElements()
+                + "*. "
+                + "Type `/chuck ? "
+                + query
+                + " --page "
+                + (page + 1 + 1)
+                + "` to see more results.");
       } else {
         response.setText(
-            "*Search results: " + (page * itemsPerPage + 1) + " - " + (page * 5 + jokes
-                .getNumberOfElements()) + " of " + jokes.getTotalElements() + "*."
-        );
+            "*Search results: "
+                + (page * itemsPerPage + 1)
+                + " - "
+                + (page * 5 + jokes.getNumberOfElements())
+                + " of "
+                + jokes.getTotalElements()
+                + "*.");
       }
 
       response.setAttachments(attachments);
@@ -294,9 +286,8 @@ public class SlackController {
         response.setText(
             "Sorry dude ¯\\_(ツ)_/¯ , the given category (\""
                 + request.getText()
-                + "\") is not whitelisted. Type `/chuck -cat` to see available categories "
-                + "or search by query `/chuck ? {search_term}`"
-        );
+                + "\") is not whitelisted. Type `/chuck -cat` to see available"
+                + " categories or search by query `/chuck ? {search_term}`");
         response.setResponseType(ResponseType.EPHEMERAL);
 
         return response;
@@ -309,9 +300,8 @@ public class SlackController {
         response.setText(
             "Sorry dude ¯\\_(ツ)_/¯ , we've found no jokes for the given category (\""
                 + request.getText()
-                + "\"). Type `/chuck -cat` to see available categories or search by "
-                + "query `/chuck ? {search_term}`"
-        );
+                + "\"). Type `/chuck -cat` to see available categories or search by"
+                + " query `/chuck ? {search_term}`");
         response.setResponseType(ResponseType.EPHEMERAL);
 
         return response;
@@ -332,17 +322,15 @@ public class SlackController {
   }
 
   private SlackCommandResponse composeJokeResponse(
-      Joke joke,
-      MultiValueMap<String, String> urlParams
-  ) {
-    UriComponents uriComponents = UriComponentsBuilder
-        .newInstance()
-        .scheme("https")
-        .host(baseUrl)
-        .path("/jokes/" + joke.getId())
-        .queryParams(urlParams)
-        .build()
-        .encode();
+      Joke joke, MultiValueMap<String, String> urlParams) {
+    UriComponents uriComponents =
+        UriComponentsBuilder.newInstance()
+            .scheme("https")
+            .host(baseUrl)
+            .path("/jokes/" + joke.getId())
+            .queryParams(urlParams)
+            .build()
+            .encode();
 
     SlackCommandResponseAttachment attachment = new CommandResponseAttachment();
     attachment.setFallback(joke.getValue());
@@ -351,9 +339,7 @@ public class SlackController {
     attachment.setTitleLink(uriComponents.toUriString());
 
     CommandResponse response = new CommandResponse();
-    response.setAttachments(
-        new SlackCommandResponseAttachment[]{attachment}
-    );
+    response.setAttachments(new SlackCommandResponseAttachment[] {attachment});
 
     return response;
   }

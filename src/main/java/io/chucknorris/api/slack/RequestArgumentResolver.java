@@ -14,7 +14,8 @@ public class RequestArgumentResolver implements HandlerMethodArgumentResolver {
   }
 
   @Override
-  public Object resolveArgument(MethodParameter methodParameter,
+  public Object resolveArgument(
+      MethodParameter methodParameter,
       ModelAndViewContainer modelAndViewContainer,
       NativeWebRequest nativeWebRequest,
       WebDataBinderFactory webDataBinderFactory) {

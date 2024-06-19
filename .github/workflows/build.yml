@@ -23,4 +23,4 @@ jobs:
           distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
           ref: ${{ inputs.version }}
-      - run: ./gradlew test
+      - run: ./gradlew test spotlessCheck

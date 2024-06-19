@@ -27,9 +27,7 @@ public class DailyChuck {
     issueNumber += 1;
   }
 
-  /**
-   * Finds an issue {@link DailyChuckIssue} by joke id.
-   */
+  /** Finds an issue {@link DailyChuckIssue} by joke id. */
   public DailyChuckIssue findIssueByJokeId(String jokeId) {
     for (DailyChuckIssue issue : issues) {
       if (issue.getJokeId().equals(jokeId)) {
@@ -39,9 +37,7 @@ public class DailyChuck {
     return null;
   }
 
-  /**
-   * Finds an issue {@link DailyChuckIssue} by a given date.
-   */
+  /** Finds an issue {@link DailyChuckIssue} by a given date. */
   public DailyChuckIssue findIssueByDate(Date date) {
     Calendar cal1 = Calendar.getInstance();
     cal1.setTime(date);
@@ -50,8 +46,9 @@ public class DailyChuck {
       Calendar cal2 = Calendar.getInstance();
       cal2.setTime(issue.getDate());
 
-      boolean isSameDay = cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
-          && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
+      boolean isSameDay =
+          cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+              && cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
 
       if (isSameDay) {
         return issue;

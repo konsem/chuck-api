@@ -32,7 +32,7 @@ public class EventService {
    * @param event The event being published {@link Event}
    * @return publishResult
    * @throws JsonProcessingException Thrown in case of problems encountered when processing JSON
-   *                                 content that are not pure I/O problems.
+   *     content that are not pure I/O problems.
    */
   public PublishResult publishEvent(Event event) throws JsonProcessingException {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
@@ -46,11 +46,12 @@ public class EventService {
 
     logger.info(
         "[event_published] "
-            +
-            "event_message_id: \"" + publishResult.getMessageId() + "\" "
-            +
-            "event_message: \"" + message + "\""
-    );
+            + "event_message_id: \""
+            + publishResult.getMessageId()
+            + "\" "
+            + "event_message: \""
+            + message
+            + "\"");
 
     return publishResult;
   }

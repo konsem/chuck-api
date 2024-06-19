@@ -18,16 +18,13 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
 
   @ExceptionHandler(value = {ConstraintViolationException.class})
   protected ResponseEntity<Object> handleConstraintViolationException(
-      ConstraintViolationException exception, ServletWebRequest request
-  ) {
+      ConstraintViolationException exception, ServletWebRequest request) {
     switch (request.getHeader(HttpHeaders.ACCEPT)) {
       case MediaType.TEXT_PLAIN_VALUE:
         StringBuilder stringBuilder = new StringBuilder();
         for (ConstraintViolation violation : exception.getConstraintViolations()) {
           stringBuilder.append(
-              violation.getPropertyPath().toString() + ": " + violation.getMessage()
-                  + '\n'
-          );
+              violation.getPropertyPath().toString() + ": " + violation.getMessage() + '\n');
         }
 
         return handleExceptionInternal(
@@ -35,13 +32,11 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
             stringBuilder.toString(),
             new HttpHeaders(),
             HttpStatus.BAD_REQUEST,
-            request
-        );
+            request);
       default:
         LinkedHashMap<String, Object> constraintViolations = new LinkedHashMap<>();
         for (ConstraintViolation violation : exception.getConstraintViolations()) {
-          constraintViolations
-              .put(violation.getPropertyPath().toString(), violation.getMessage());
+          constraintViolations.put(violation.getPropertyPath().toString(), violation.getMessage());
         }
 
         LinkedHashMap<String, Object> body = new LinkedHashMap<>();
@@ -52,12 +47,7 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
         body.put("violations", constraintViolations);
 
         return handleExceptionInternal(
-            exception,
-            body,
-            new HttpHeaders(),
-            HttpStatus.BAD_REQUEST,
-            request
-        );
+            exception, body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
   }
 }

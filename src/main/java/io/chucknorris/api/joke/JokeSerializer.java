@@ -24,9 +24,10 @@ public class JokeSerializer extends StdSerializer<Joke> {
       throws IOException {
     jsonGenerator.writeStartObject();
 
-    String[] categories = joke.getCategories() != null && joke.getCategories().length > 0
-        ? joke.getCategories()
-        : new String[0];
+    String[] categories =
+        joke.getCategories() != null && joke.getCategories().length > 0
+            ? joke.getCategories()
+            : new String[0];
     jsonGenerator.writeArrayFieldStart("categories");
     for (String category : categories) {
       jsonGenerator.writeString(category);

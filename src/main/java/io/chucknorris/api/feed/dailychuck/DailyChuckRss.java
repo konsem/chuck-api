@@ -20,9 +20,7 @@ public class DailyChuckRss extends AbstractRssFeedView {
   private DailyChuck dailyChuck;
   private JokeRepository jokeRepository;
 
-  /**
-   * Instantiates a new DailyChuckRss {@link DailyChuckRss}.
-   */
+  /** Instantiates a new DailyChuckRss {@link DailyChuckRss}. */
   public DailyChuckRss(String baseUrl, DailyChuck dailyChuck, JokeRepository jokeRepository) {
     this.baseUrl = baseUrl;
     this.dailyChuck = dailyChuck;
@@ -30,28 +28,29 @@ public class DailyChuckRss extends AbstractRssFeedView {
   }
 
   @Override
-  protected void buildFeedMetadata(Map<String, Object> model, Channel feed,
-      HttpServletRequest request) {
+  protected void buildFeedMetadata(
+      Map<String, Object> model, Channel feed, HttpServletRequest request) {
     feed.setTitle("The Daily Chuck");
     feed.setDescription(
         "Get your daily dose of the best #ChuckNorrisFacts "
-            + "every morning straight into your inbox."
-    );
+            + "every morning straight into your inbox.");
     feed.setLink("https://" + baseUrl + "/feed/daily-chuck.xml");
   }
 
   @Override
-  protected List<Item> buildFeedItems(Map<String, Object> model, HttpServletRequest request,
-      HttpServletResponse response) {
+  protected List<Item> buildFeedItems(
+      Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) {
     DailyChuckIssue[] dailyChuckIssues = dailyChuck.getIssues();
-    Arrays.sort(dailyChuck.getIssues(),
-        Comparator.comparing(DailyChuckIssue::getDate).reversed());
+    Arrays.sort(dailyChuck.getIssues(), Comparator.comparing(DailyChuckIssue::getDate).reversed());
 
     DailyChuckIssue currentIssue = dailyChuckIssues[0];
-    Joke joke = jokeRepository.findById(currentIssue.getJokeId()).orElseThrow(
-        () -> new EntityNotFoundException(
-            "Joke with id \"" + currentIssue.getJokeId() + "\" not found.")
-    );
+    Joke joke =
+        jokeRepository
+            .findById(currentIssue.getJokeId())
+            .orElseThrow(
+                () ->
+                    new EntityNotFoundException(
+                        "Joke with id \"" + currentIssue.getJokeId() + "\" not found."));
 
     Long issueNumber = dailyChuck.getIssueNumber();
     Item entry = new Item();

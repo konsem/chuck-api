@@ -9,15 +9,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class PrivacyController {
 
-  /**
-   * Returns privacy view.
-   */
+  /** Returns privacy view. */
   public @RequestMapping(
       value = "/privacy",
       method = RequestMethod.GET,
       headers = HttpHeaders.ACCEPT + "=" + MediaType.TEXT_HTML_VALUE,
-      produces = MediaType.TEXT_HTML_VALUE
-  ) String get() {
+      produces = MediaType.TEXT_HTML_VALUE) String get() {
     return "privacy";
   }
 }

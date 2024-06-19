@@ -22,22 +22,17 @@ public class AmazonWebServicesConfig {
   @Value("${aws.region}")
   private String region;
 
-  /**
-   * Returns a new {@link AmazonS3} instance.
-   */
+  /** Returns a new {@link AmazonS3} instance. */
   public @Bean AmazonS3 amazonS3() {
     AWSCredentials credentials = new BasicAWSCredentials(accessKeyId, accessKeySecret);
 
-    return AmazonS3ClientBuilder
-        .standard()
+    return AmazonS3ClientBuilder.standard()
         .withCredentials(new AWSStaticCredentialsProvider(credentials))
         .withRegion(region)
         .build();
   }
 
-  /**
-   * Returns a new {@link AmazonSNSClient} instance.
-   */
+  /** Returns a new {@link AmazonSNSClient} instance. */
   public @Bean AmazonSNSClient snsClient() {
     AWSCredentials credentials = new BasicAWSCredentials(accessKeyId, accessKeySecret);
 

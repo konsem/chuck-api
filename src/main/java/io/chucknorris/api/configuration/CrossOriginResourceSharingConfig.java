@@ -10,9 +10,7 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class CrossOriginResourceSharingConfig {
 
-  /**
-   * Returns cors filter registration bean {@link CorsConfiguration}.
-   */
+  /** Returns cors filter registration bean {@link CorsConfiguration}. */
   public @Bean FilterRegistrationBean corsFilter() {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowCredentials(true);

@@ -28,24 +28,20 @@ public class SlackService {
   @Value("${slack.oauth.redirect_uri}")
   private String redirectUrl;
 
-  @Autowired
-  private RestTemplate restTemplate;
+  @Autowired private RestTemplate restTemplate;
 
   @Value("${slack.content.whitelisted_categories}")
   private String whitelistedCategories;
 
-  /**
-   * Composes the authorize uri.
-   */
+  /** Composes the authorize uri. */
   public UriComponents composeAuthorizeUri() {
-    //@see  https://api.slack.com/docs/oauth-scopes
+    // @see  https://api.slack.com/docs/oauth-scopes
     MultiValueMap<String, String> urlQueryParams = new LinkedMultiValueMap<>();
     urlQueryParams.set("client_id", clientId);
     urlQueryParams.set("redirect_uri", redirectUrl);
     urlQueryParams.set("scope", "commands");
 
-    return UriComponentsBuilder
-        .newInstance()
+    return UriComponentsBuilder.newInstance()
         .scheme("https")
         .host("slack.com")
         .path("/oauth/v2/authorize/")
@@ -54,36 +50,24 @@ public class SlackService {
         .encode();
   }
 
-  /**
-   * Filters all non-whitelisted categories from array.
-   */
+  /** Filters all non-whitelisted categories from array. */
   public String[] filterNonWhitelistedCategories(String[] categories) {
-    return Arrays.stream(categories).filter(
-        category -> isWhitelistedCategory(category)
-    ).toArray(String[]::new);
+    return Arrays.stream(categories)
+        .filter(category -> isWhitelistedCategory(category))
+        .toArray(String[]::new);
   }
 
-  /**
-   * Returns an array of whitelisted categories.
-   */
+  /** Returns an array of whitelisted categories. */
   public String[] getWhitelistedCategories() {
-    return whitelistedCategories != null
-        ? whitelistedCategories.split(",")
-        : new String[]{};
+    return whitelistedCategories != null ? whitelistedCategories.split(",") : new String[] {};
   }
 
-  /**
-   * Checks if a given category is whitelisted.
-   */
+  /** Checks if a given category is whitelisted. */
   public Boolean isWhitelistedCategory(String category) {
-    return Arrays.asList(
-        getWhitelistedCategories()
-    ).contains(category);
+    return Arrays.asList(getWhitelistedCategories()).contains(category);
   }
 
-  /**
-   * Requests an access token from Slack.
-   */
+  /** Requests an access token from Slack. */
   public AccessToken requestAccessToken(final String code) {
     HttpHeaders headers = new HttpHeaders();
     headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
@@ -96,12 +80,12 @@ public class SlackService {
     map.add("redirect_uri", redirectUrl);
 
     try {
-      ResponseEntity<AccessToken> responseEntity = restTemplate.exchange(
-          "https://slack.com/api/oauth.v2.access",
-          HttpMethod.POST,
-          new HttpEntity<>(map, headers),
-          AccessToken.class
-      );
+      ResponseEntity<AccessToken> responseEntity =
+          restTemplate.exchange(
+              "https://slack.com/api/oauth.v2.access",
+              HttpMethod.POST,
+              new HttpEntity<>(map, headers),
+              AccessToken.class);
 
       return responseEntity.getBody();
     } catch (RestClientException exception) {
