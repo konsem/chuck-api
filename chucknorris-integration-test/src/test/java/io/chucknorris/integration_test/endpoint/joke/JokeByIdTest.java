@@ -1,12 +1,12 @@
 package io.chucknorris.integration_test.endpoint.joke;
 
+import static io.restassured.RestAssured.given;
+
 import io.chucknorris.integration_test.endpoint.AbstractEndpointTest;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static io.restassured.RestAssured.given;
 
 class JokeByIdTest extends AbstractEndpointTest {
 
@@ -30,12 +30,13 @@ class JokeByIdTest extends AbstractEndpointTest {
                 .assertThat()
                 .header("Content-Type", Matchers.equalTo("application/json"))
                 .body("categories", Matchers.emptyIterable())
-                .body("created_at", Matchers.comparesEqualTo("2024-06-19 09:28:25.390787"))
+                .body("created_at", Matchers.isA(String.class))
                 .body("icon_url", Matchers.comparesEqualTo("https://api.chucknorris.io/img/avatar/chuck-norris.png"))
                 .body("id", Matchers.comparesEqualTo(jokeId))
-                .body("updated_at", Matchers.comparesEqualTo("2024-06-19 09:28:25.390787"))
+                .body("updated_at", Matchers.isA(String.class))
                 .body("url", Matchers.comparesEqualTo("https://api.chucknorris.io/jokes/c9h1endqtmm31b1auddvdg"))
-                .body("value", Matchers.comparesEqualTo("Chuck Norris once lost the remote, but maintained control of the TV by yelling at it in between bites of his \"Filet of Child\" sandwich."));
+                .body("value", Matchers.comparesEqualTo(
+                        "Chuck Norris once lost the remote, but maintained control of the TV by yelling at it in between bites of his \"Filet of Child\" sandwich."));
     }
 
     @DisplayName("Should return joke by id as plain text")

@@ -1,53 +1,49 @@
 package io.chucknorris.api.joke;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-@RunWith(MockitoJUnitRunner.class)
-public class JokeServiceTest {
+class JokeServiceTest {
 
-    private static String jokeId, jokeValue;
-    private static Joke joke;
+    private final String jokeId = "ys--0t_-rrifz5jtcparbg";
+    private final String jokeValue = "Some people ask for a Kleenex when they sneeze, Chuck Norris asks for a body bag.";
 
-    @Mock
-    private JokeRepository jokeRepository;
+    private final Joke joke = Joke.builder()
+            .categories(new String[] { "dev" })
+            .id(jokeId)
+            .value(jokeValue)
+            .build();
 
-    @InjectMocks
-    private JokeService jokeService;
-
-    @Before
-    public void setUp() throws Exception {
-        jokeId = "ys--0t_-rrifz5jtcparbg";
-        jokeValue = "Some people ask for a Kleenex when they sneeze, Chuck Norris asks for a body bag.";
-        joke = Joke.builder().categories(new String[] { "dev" }).id(jokeId).value(jokeValue).build();
-    }
-
-  @Test
-  public void testRandomJokeByCategoriesReturnsJoke() {
-    when(jokeRepository.getRandomJokeByCategories("dev,movie")).thenReturn(joke);
-
-    Joke joke = jokeService.randomJokeByCategories(new String[] {"dev", "movie"});
-    assertEquals(JokeServiceTest.joke, joke);
-
-    verify(jokeRepository, times(1)).getRandomJokeByCategories("dev,movie");
-    verifyNoMoreInteractions(jokeRepository);
-  }
+    private final JokeRepository jokeRepository = Mockito.mock(JokeRepository.class);
+    private final JokeService jokeService = new JokeService(jokeRepository);
 
     @Test
-    public void testRandomPersonalizedJokeByCategoriesReturnsJoke() {
+    void testRandomJokeByCategoriesReturnsJoke() {
+        // setup:
+        when(jokeRepository.getRandomJokeByCategories("dev,movie")).thenReturn(joke);
+
+        // when:
+        var actual = jokeService.randomJokeByCategories(new String[]{"dev", "movie"});
+
+        // then:
+        Assertions.assertEquals(this.joke, actual);
+
+        // and:
+        verify(jokeRepository, times(1)).getRandomJokeByCategories("dev,movie");
+        verifyNoMoreInteractions(jokeRepository);
+    }
+
+    @Test
+    void testRandomPersonalizedJokeByCategoriesReturnsJoke() {
         String substitute = "Bob";
         String[] categories = new String[] { "dev", "movie" };
 
@@ -56,14 +52,14 @@ public class JokeServiceTest {
                 .thenReturn(joke);
 
         Joke joke = jokeService.randomPersonalizedJokeByCategories(substitute, categories);
-        assertEquals(JokeServiceTest.joke, joke);
+        Assertions.assertEquals(this.joke, joke);
 
         verify(jokeRepository, times(1)).getRandomPersonalizedJokeByCategories(substitute, "dev,movie");
         verifyNoMoreInteractions(jokeRepository);
     }
 
     @Test
-    public void testSearchWithCategoryFilter() {
+    void testSearchWithCategoryFilter() {
         String query = "Kleenex";
         String[] categories = new String[] { "dev", "movie" };
         Pageable pageable = PageRequest.of(1, 5);

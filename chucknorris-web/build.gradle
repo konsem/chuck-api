@@ -20,7 +20,8 @@ dependencies {
     implementation "com.google.guava:guava:33.2.1-jre"
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation "junit:junit:4.12"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${Version.JUNIT}"
+    testImplementation "org.junit.jupiter:junit-jupiter:${Version.JUNIT}"
 }
 
 tasks {

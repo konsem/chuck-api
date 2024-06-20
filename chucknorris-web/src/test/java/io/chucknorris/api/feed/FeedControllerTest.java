@@ -1,7 +1,10 @@
 package io.chucknorris.api.feed;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import io.chucknorris.api.feed.dailychuck.DailyChuck;
@@ -19,46 +22,33 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@RunWith(MockitoJUnitRunner.class)
 public class FeedControllerTest {
 
     private DailyChuck dailyChuck;
-
     private DailyChuckIssue dailyChuckIssue;
-
-    @Mock
-    private DailyChuckService dailyChuckService;
-
-    @Mock
-    private DateUtil dateUtil;
-
+    private DailyChuckService dailyChuckService = Mockito.mock(DailyChuckService.class);
+    private DateUtil dateUtil = Mockito.mock(DateUtil.class);
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-
-    @Mock
-    private EventService eventService;
-
-    @InjectMocks
-    private FeedController feedController;
-
-    @Mock
-    private JokeRepository jokeRepository;
-
-    @Mock
-    private MailchimpService mailchimpService;
-
+    private EventService eventService = Mockito.mock(EventService.class);
+    private JokeRepository jokeRepository = Mockito.mock(JokeRepository.class);
+    private MailchimpService mailchimpService = Mockito.mock(MailchimpService.class);
     private MailingListStatistic mailingListStatistic;
+
+    private FeedController feedController = new FeedController(
+            dailyChuckService,
+            dateUtil,
+            eventService,
+            mailchimpService);
 
     private String mailingListId;
 
-    @Before
+    @BeforeEach
     public void setUp() throws ParseException {
         dailyChuckIssue = new DailyChuckIssue();
         dailyChuckIssue.setDate(dateFormat.parse("2019-01-01"));
@@ -83,23 +73,23 @@ public class FeedControllerTest {
         when(mailchimpService.fetchListStats(mailingListId)).thenReturn(mailingListStatistic);
     }
 
-  @Test
-  public void testDailyChuckJsonReturnsDailyChuckWithoutComposingANewIssueIfItHasAlreadyBeenIssued()
-      throws IOException, ParseException {
-    when(dailyChuckService.getDailyChuck()).thenReturn(dailyChuck);
-    when(dateUtil.now()).thenReturn(dateFormat.parse("2019-01-01"));
+    @Test
+    public void testDailyChuckJsonReturnsDailyChuckWithoutComposingANewIssueIfItHasAlreadyBeenIssued()
+        throws IOException, ParseException {
+        when(dailyChuckService.getDailyChuck()).thenReturn(dailyChuck);
+        when(dateUtil.now()).thenReturn(dateFormat.parse("2019-01-01"));
 
-    assertEquals(dailyChuck, feedController.dailyChuckJson());
+        Assertions.assertEquals(dailyChuck, feedController.dailyChuckJson());
 
-    verify(dailyChuckService, times(1)).getDailyChuck();
-    verifyNoMoreInteractions(dailyChuckService);
+        verify(dailyChuckService, times(1)).getDailyChuck();
+        verifyNoMoreInteractions(dailyChuckService);
 
-    verify(dateUtil, times(1)).now();
-    verifyNoMoreInteractions(dateUtil);
+        verify(dateUtil, times(1)).now();
+        verifyNoMoreInteractions(dateUtil);
 
-    verify(eventService, times(0)).publishEvent(any());
-    verifyNoMoreInteractions(eventService);
-  }
+        verify(eventService, times(0)).publishEvent(any());
+        verifyNoMoreInteractions(eventService);
+    }
 
     @Test
     public void testDailyChuckJsonReturnsDailyChuckWithComposingANewIssue()
@@ -110,7 +100,7 @@ public class FeedControllerTest {
         when(dateUtil.now()).thenReturn(dateFormat.parse("2019-01-02"));
         when(dailyChuckService.composeDailyChuckIssue(any())).thenReturn(newDailyChuckIssue);
 
-        assertEquals(dailyChuck, feedController.dailyChuckJson());
+        Assertions.assertEquals(dailyChuck, feedController.dailyChuckJson());
 
         verify(dailyChuckService, times(1)).getDailyChuck();
         verify(dailyChuckService, times(1)).composeDailyChuckIssue(any());
@@ -133,7 +123,7 @@ public class FeedControllerTest {
         when(dateUtil.now()).thenReturn(dateFormat.parse("2019-01-01"));
         when(dailyChuckService.toRss(dailyChuck)).thenReturn(dailyChuckRss);
 
-        assertEquals(dailyChuckRss, feedController.dailyChuckRss());
+        Assertions.assertEquals(dailyChuckRss, feedController.dailyChuckRss());
 
         verify(dailyChuckService, times(1)).getDailyChuck();
         verify(dailyChuckService, times(1)).toRss(dailyChuck);
@@ -159,7 +149,7 @@ public class FeedControllerTest {
         when(dailyChuckService.composeDailyChuckIssue(any())).thenReturn(newDailyChuckIssue);
         when(dailyChuckService.toRss(dailyChuck)).thenReturn(dailyChuckRss);
 
-        assertEquals(dailyChuckRss, feedController.dailyChuckRss());
+        Assertions.assertEquals(dailyChuckRss, feedController.dailyChuckRss());
 
         verify(dailyChuckService, times(1)).getDailyChuck();
         verify(dailyChuckService, times(1)).composeDailyChuckIssue(any());
@@ -180,7 +170,7 @@ public class FeedControllerTest {
     @Test
     public void testDailyChuckStatsReturnsStats() {
         MailingListStatistic response = feedController.dailyChuckStats();
-        assertEquals(response, mailingListStatistic);
+        Assertions.assertEquals(response, mailingListStatistic);
 
         verify(mailchimpService, times(1)).fetchListStats(mailingListId);
         verifyNoMoreInteractions(mailchimpService);

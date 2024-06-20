@@ -1,13 +1,12 @@
 package io.chucknorris.api.configuration;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-
-public class HerokuDataSourcePropertiesTest {
+class HerokuDataSourcePropertiesTest {
 
     @Test
-    public void testShouldCreateDataSourcePostgres() {
+    void testShouldCreateDataSourcePostgres() {
         // given:
         String driverClassName = "org.postgresql.Driver";
 
@@ -18,11 +17,9 @@ public class HerokuDataSourcePropertiesTest {
         HerokuDataSourceProperties actual = new HerokuDataSourceProperties(driverClassName, uri);
 
         // then:
-        assertEquals("org.postgresql.Driver", actual.getDriverClassName());
-        assertEquals("password", actual.getPassword());
-        assertEquals(
-                "jdbc:postgresql://ec2-00-000-00-000.eu-west-1.compute.amazonaws.com:5432/d409qm4ujtafvk",
-                actual.getUrl());
-        assertEquals("username", actual.getUsername());
+        Assertions.assertEquals("org.postgresql.Driver", actual.getDriverClassName());
+        Assertions.assertEquals("password", actual.getPassword());
+        Assertions.assertEquals("jdbc:postgresql://ec2-00-000-00-000.eu-west-1.compute.amazonaws.com:5432/d409qm4ujtafvk", actual.getUrl());
+        Assertions.assertEquals("username", actual.getUsername());
     }
 }

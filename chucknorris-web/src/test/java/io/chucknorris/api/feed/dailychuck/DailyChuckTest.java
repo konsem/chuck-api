@@ -1,21 +1,20 @@
 package io.chucknorris.api.feed.dailychuck;
 
-import static org.junit.Assert.assertEquals;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DailyChuckTest {
 
-    private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+    private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
     private DailyChuck dailyChuck;
     private DailyChuckIssue dailyChuckIssue;
 
-    @Before
+    @BeforeEach
     public void setUp() throws ParseException {
         dailyChuckIssue = new DailyChuckIssue();
         dailyChuckIssue.setDate(dateFormat.parse("2019-01-01"));
@@ -26,22 +25,23 @@ public class DailyChuckTest {
     }
 
     @Test
-    public void testFindIssueByJokeIdReturnsNullDoesNotExist() {
-        assertEquals(dailyChuck.findIssueByJokeId("does-not-exist"), null);
+    void testFindIssueByJokeIdReturnsNullDoesNotExist() {
+        Assertions.assertNull(dailyChuck.findIssueByJokeId("does-not-exist"));
     }
 
     @Test
-    public void testFindIssueByJokeIdReturnsDailyChuckIssueIfDoesExist() {
-        assertEquals(dailyChuck.findIssueByJokeId("c5k7tulvqjs76evwb3brfg"), dailyChuckIssue);
+    void testFindIssueByJokeIdReturnsDailyChuckIssueIfDoesExist() {
+        Assertions.assertEquals(dailyChuck.findIssueByJokeId("c5k7tulvqjs76evwb3brfg"), dailyChuckIssue);
     }
 
     @Test
-    public void testFindIssueByDateReturnsNullDoesNotExist() throws ParseException {
-        assertEquals(dailyChuck.findIssueByDate(dateFormat.parse("2019-01-02")), null);
+    void testFindIssueByDateReturnsNullDoesNotExist() throws ParseException {
+        Assertions.assertNull(dailyChuck.findIssueByDate(dateFormat.parse("2019-01-02")));
     }
 
     @Test
-    public void testFindIssueByDateDailyChuckIssueIfDoesExist() throws ParseException {
-        assertEquals(dailyChuck.findIssueByDate(dateFormat.parse("2019-01-01")), dailyChuckIssue);
+    void testFindIssueByDateDailyChuckIssueIfDoesExist() throws ParseException {
+        Assertions.assertEquals(
+                dailyChuck.findIssueByDate(dateFormat.parse("2019-01-01")), dailyChuckIssue);
     }
 }
