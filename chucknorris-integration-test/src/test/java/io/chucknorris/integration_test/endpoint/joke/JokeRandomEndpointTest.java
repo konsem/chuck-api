@@ -1,6 +1,7 @@
 package io.chucknorris.integration_test.endpoint.joke;
 
 import io.chucknorris.integration_test.endpoint.AbstractEndpointTest;
+import io.restassured.module.jsv.JsonSchemaValidator;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,29 @@ import static io.restassured.RestAssured.given;
 
 class JokeRandomEndpointTest extends AbstractEndpointTest {
 
+    private static final String ENDPOINT = "/jokes/random";
+    private static final String JSON_SCHEMA_PATH = "schema/joke/random/success.json";
+
+    @DisplayName("Should conform to json schema")
+    @Test
+    void shouldConformToJsonSchema() {
+        // given:
+        var specification = given()
+                .log().all()
+                .accept("application/json");
+
+        // when:
+        var response = specification.when().get(ENDPOINT);
+
+        // then:
+        response.then()
+                .log().all()
+                .statusCode(200)
+                .body(JsonSchemaValidator.matchesJsonSchemaInClasspath(JSON_SCHEMA_PATH))
+                .extract()
+                .response();
+    }
+
     @DisplayName("Should return joke as json")
     @Test
     void shouldReturnJokeAsJson() {
@@ -20,7 +44,7 @@ class JokeRandomEndpointTest extends AbstractEndpointTest {
                 .accept("application/json");
 
         // when:
-        var response = specification.when().get("/jokes/random");
+        var response = specification.when().get(ENDPOINT);
 
         // then:
         response.then()
@@ -47,7 +71,7 @@ class JokeRandomEndpointTest extends AbstractEndpointTest {
                 .header("Origin", "http://localhost:3000");
 
         // when:
-        var response = specification.when().get("/jokes/random");
+        var response = specification.when().get(ENDPOINT);
 
         // then:
         response.then()
