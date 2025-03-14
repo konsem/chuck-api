@@ -16,6 +16,7 @@ jobs:
   unit-test:
     runs-on: [ ubuntu-latest ]
     steps:
+      - run: echo "==jobs/steps=="
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.version }}
@@ -29,6 +30,7 @@ jobs:
   integration-test:
     runs-on: [ ubuntu-latest ]
     steps:
+      - run: echo "==integration-test/steps=="
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.version }}
