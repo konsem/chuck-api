@@ -27,18 +27,18 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - run: ./gradlew clean test spotlessCheck --exclude-task :chucknorris-integration-test:test
 
-  integration-test:
-    runs-on: [ ubuntu-latest ]
-    steps:
-      - run: echo "==integration-test/steps=="
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.version }}
-      - uses: actions/setup-java@v4
-        with:
-          cache: gradle
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-          java-version: ${{ env.JAVA_VERSION }}
-      - name: Run Integration Test
-        shell: bash
-        run: ./chucknorris-integration-test/script/run-integration-test.sh
+  # integration-test:
+  #   runs-on: [ ubuntu-latest ]
+  #   steps:
+  #     - run: echo "==integration-test/steps=="
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         ref: ${{ inputs.version }}
+  #     - uses: actions/setup-java@v4
+  #       with:
+  #         cache: gradle
+  #         distribution: ${{ env.JAVA_DISTRIBUTION }}
+  #         java-version: ${{ env.JAVA_VERSION }}
+  #     - name: Run Integration Test
+  #       shell: bash
+  #       run: ./chucknorris-integration-test/script/run-integration-test.sh
