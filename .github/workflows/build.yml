@@ -27,6 +27,19 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
       - run: ./gradlew clean test spotlessCheck --exclude-task :chucknorris-integration-test:test
 
+      # Add a build step to create artifacts
+      - name: Build with Gradle
+        run: ./gradlew build --exclude-task test
+      
+      # Upload the build artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: chuck-api-build
+          path: |
+            **/build/libs/*.jar
+            **/build/distributions/*.zip
+  
   # integration-test:
   #   runs-on: [ ubuntu-latest ]
   #   steps:
